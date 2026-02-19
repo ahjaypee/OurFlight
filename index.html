@@ -3,19 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flight Tracker</title>
+    <title>Travel Itinerary</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>Upcoming Flights</h1>
-        <p>Tap Google or FlightAware for live status updates.</p>
+        <h1>Upcoming Itinerary</h1>
+        
+        <div class="filter-bar">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="flight">✈️ Flights</button>
+            <button class="filter-btn" data-filter="train">🚆 Trains</button>
+            <button class="filter-btn" data-filter="car">🚗 Cars</button>
+            <button class="filter-btn" data-filter="hotel">🏨 Hotels</button>
+            <button class="filter-btn" data-filter="excursion">🍳 Excursions</button>
+        </div>
     </header>
     
-    <main id="flights-container">
+    <main id="itinerary-container">
         </main>
 
-    <script src="flights.js"></script>
+    <script src="data.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
