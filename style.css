@@ -128,4 +128,9 @@ header p {
 
 .action-btn:active {
     opacity: 0.8;
+
+}/* Add this to the very bottom of your style.css file */
+.flight-card.past {
+    filter: grayscale(100%);
+    opacity: 0.6;
 }
