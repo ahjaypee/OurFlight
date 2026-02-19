@@ -425,8 +425,36 @@ const itineraryData = [
     link1Url: "https://www.sixt.com/account/#/manage-my-booking-info",
     link2Text: "LHR T5 Map",
     link2Url: "https://maps.google.com/?q=Sixt+London+Heathrow+Terminal+5"
+  },
+  // --- BARBADOS TRIP (PAST) ---
+  {
+    type: "flight",
+    title: "American Airlines",
+    reference: "AA [Update]",
+    startPoint: "Philadelphia (PHL)",
+    endPoint: "Barbados (BGI)",
+    date: "Jan 24, 2026",
+    time: "12:00 PM", 
+    link1Text: "Google Status",
+    link1Url: "https://www.google.com/search?q=AA+[Update]+flight+status",
+    link2Text: "FlightAware",
+    link2Url: "https://flightaware.com/live/flight/AA[Update]"
+  },
+  {
+    type: "flight",
+    title: "American Airlines",
+    reference: "AA [Update]",
+    startPoint: "Barbados (BGI)",
+    endPoint: "Philadelphia (PHL)",
+    date: "Feb 6, 2026",
+    time: "12:00 PM", 
+    link1Text: "Google Status",
+    link1Url: "https://www.google.com/search?q=AA+[Update]+flight+status",
+    link2Text: "FlightAware",
+    link2Url: "https://flightaware.com/live/flight/AA[Update]"
   }
 ];
+
 
 
 
