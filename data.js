@@ -250,5 +250,46 @@ const itineraryData = [
     link1Url: "https://www.google.com/search?q=AA+759+flight+status",
     link2Text: "FlightAware",
     link2Url: "https://flightaware.com/live/flight/AA759"
+  },
+  // --- EUROPEAN RAIL JOURNEY ---
+  {
+    type: "train",
+    title: "Deutsche Bahn / SBB",
+    reference: "ICE / EC [Update]",
+    startPoint: "Stuttgart Hbf",
+    endPoint: "Lucerne",
+    date: "May 18, 2026", // Update with your actual travel date
+    time: "10:00 AM",     // Update with your actual departure time
+    link1Text: "DB Live Status",
+    link1Url: "https://int.bahn.de/en/",
+    link2Text: "SBB Timetable",
+    link2Url: "https://www.sbb.ch/en"
+  },
+  {
+    type: "train",
+    title: "SBB (Swiss Federal Railways)",
+    reference: "IC [Update]",
+    startPoint: "Lucerne",
+    endPoint: "Lugano",
+    date: "May 22, 2026", // Update with your actual travel date
+    time: "11:00 AM",     // Update with your actual departure time
+    link1Text: "SBB Live Status",
+    link1Url: "https://www.sbb.ch/en",
+    link2Text: "Station Map",
+    link2Url: "https://www.sbb.ch/en/travel-information/stations.html"
+  },
+  {
+    type: "train",
+    title: "SBB / Trenitalia",
+    reference: "EC [Update]",
+    startPoint: "Lugano",
+    endPoint: "Venice S. Lucia",
+    date: "May 26, 2026", // Update with your actual travel date
+    time: "09:30 AM",     // Update with your actual departure time
+    link1Text: "Trenitalia Status",
+    link1Url: "https://www.trenitalia.com/en.html",
+    link2Text: "SBB Timetable",
+    link2Url: "https://www.sbb.ch/en"
   }
 ];
+
