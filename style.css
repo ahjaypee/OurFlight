@@ -13,13 +13,40 @@ body {
 
 header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
-header p {
+/* New Filter Bar Styles */
+.filter-bar {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding: 10px 0;
+    margin-top: 15px;
+    /* Hide scrollbar for a cleaner look */
+    scrollbar-width: none; 
+}
+.filter-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.filter-btn {
+    background-color: #1b263b;
     color: #a9b3c1;
+    border: 1px solid #415a77;
+    border-radius: 20px;
+    padding: 8px 16px;
     font-size: 0.9em;
-    margin-top: 5px;
+    font-weight: bold;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-btn.active {
+    background-color: #f77f00;
+    color: #ffffff;
+    border-color: #f77f00;
 }
 
 .flight-card {
@@ -30,6 +57,11 @@ header p {
     margin-bottom: 20px;
     display: block;
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.flight-card.past {
+    filter: grayscale(100%);
+    opacity: 0.6;
 }
 
 .flight-card.changed {
@@ -55,7 +87,9 @@ header p {
     align-items: center;
     font-size: 1.1em;
     margin-bottom: 15px;
+    text-align: center;
 }
+.route span { flex: 1; }
 
 .details {
     display: flex;
@@ -79,7 +113,7 @@ header p {
 }
 
 .flight-number {
-    background-color: #f77f00;
+    background-color: #415a77;
     color: #ffffff;
     padding: 6px 12px;
     border-radius: 20px;
@@ -95,6 +129,7 @@ header p {
     padding-top: 10px;
 }
 
+/* Updated Generic Button Styles */
 .button-group {
     display: flex;
     gap: 10px;
@@ -111,26 +146,21 @@ header p {
     text-decoration: none;
     font-weight: bold;
     font-size: 0.85em;
-    transition: background-color 0.2s;
+    transition: opacity 0.2s;
 }
 
-.google-btn {
-    background-color: #f1f3f4;
-    color: #3c4043;
-    border: 1px solid #dadce0;
+.primary-btn {
+    background-color: #e8f0fe;
+    color: #1a73e8;
+    border: 1px solid #d2e3fc;
 }
 
-.flightaware-btn {
-    background-color: #e6f0fa;
-    color: #0050b3;
-    border: 1px solid #b3d4ff;
+.secondary-btn {
+    background-color: #fce8e6;
+    color: #c5221f;
+    border: 1px solid #fad2cf;
 }
 
 .action-btn:active {
     opacity: 0.8;
-
-}/* Add this to the very bottom of your style.css file */
-.flight-card.past {
-    filter: grayscale(100%);
-    opacity: 0.6;
 }
