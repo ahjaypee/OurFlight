@@ -412,8 +412,22 @@ const itineraryData = [
     link1Url: "https://www.google.com/search?q=La+Siesta+Premium+Hang+Be",
     link2Text: "Directions",
     link2Url: "https://www.google.com/maps/search/La+Siesta+Premium+Hang+Be"
+  },
+  {
+    type: "car",
+    title: "Sixt Rent a Car",
+    reference: "VW Golf (CDAR)",
+    startPoint: "LHR Terminal 5",
+    endPoint: "Return: Sep 10 @ 5:00 PM",
+    date: "Sep 2, 2026",
+    time: "11:00 AM",
+    link1Text: "Manage Booking",
+    link1Url: "https://www.sixt.com/account/#/manage-my-booking-info",
+    link2Text: "LHR T5 Map",
+    link2Url: "https://maps.google.com/?q=Sixt+London+Heathrow+Terminal+5"
   }
 ];
+
 
 
 
