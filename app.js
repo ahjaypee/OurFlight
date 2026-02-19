@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isPast) classNames.push('past');
             card.className = classNames.join(' ');
 
-            card.innerHTML = `
+           card.innerHTML = `
                 ${isChanged ? '<div class="changed-badge">UPDATED</div>' : ''}
                 <div class="route">
                     <span>${item.startPoint}</span>
@@ -60,7 +60,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="date">${item.date}</span>
                         <span class="time">${item.time}</span>
                     </div>
-                    <div class="flight-number">${item.reference}</div>
+                    <div class="reference-group">
+                        <div class="flight-number">${item.reference}</div>
+                        ${item.pnr ? `<div class="pnr-badge">PNR: ${item.pnr}</div>` : ''}
+                    </div>
                 </div>
                 <div class="airline">${item.title}</div>
                 
@@ -85,3 +88,4 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCards();
     localStorage.setItem(CACHE_KEY, JSON.stringify(itineraryData));
 });
+
