@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterBtns = document.querySelectorAll('.filter-btn');
     const CACHE_KEY = 'cachedItineraryData';
     
-    // Define icons for each category
     const typeIcons = {
         flight: '✈️',
         train: '🚆',
@@ -12,23 +11,28 @@ document.addEventListener('DOMContentLoaded', () => {
         excursion: '🍳'
     };
 
-    // Sort all data chronologically by date and time
+    // NEW: Error handling if data.js is missing or misnamed
+    if (typeof itineraryData === 'undefined') {
+        container.innerHTML = '<p style="text-align:center; padding: 30px; color: #ffba08;">⚠️ Could not load data.js. Please check the file name and your index.html links.</p>';
+        return;
+    }
+
+    // Sort chronologically
     itineraryData.sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
 
     let cachedData = JSON.parse(localStorage.getItem(CACHE_KEY)) || [];
 
-    // Function to draw the cards on the screen
     function renderCards(filterType = 'all') {
-        container.innerHTML = ''; // Clear current cards
+        container.innerHTML = ''; 
 
-        itineraryData.forEach((item, index) => {
-            // Skip this card if it doesn't match the active filter
+        itineraryData.forEach((item) => {
             if (filterType !== 'all' && item.type !== filterType) return;
 
+            // NEW: Smarter change-tracking by reference number instead of list position
             let isChanged = false;
-            if (cachedData.length > 0 && cachedData[index]) {
-                const oldItem = cachedData[index];
-                if (oldItem.time !== item.time || oldItem.date !== item.date || oldItem.reference !== item.reference) {
+            if (cachedData.length > 0) {
+                const oldItem = cachedData.find(old => old.reference === item.reference);
+                if (oldItem && (oldItem.time !== item.time || oldItem.date !== item.date)) {
                     isChanged = true;
                 }
             }
@@ -70,19 +74,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Handle filter button clicks
     filterBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
-            // Remove active class from all buttons
             filterBtns.forEach(b => b.classList.remove('active'));
-            // Add active class to the clicked button
             e.target.classList.add('active');
-            // Re-draw the screen with the new filter
             renderCards(e.target.dataset.filter);
         });
     });
 
-    // Initial draw
     renderCards();
     localStorage.setItem(CACHE_KEY, JSON.stringify(itineraryData));
 });
