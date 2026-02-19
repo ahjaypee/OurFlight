@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     flightsData.forEach((flight, index) => {
         let isChanged = false;
         
+        // Check for modified flight details
         if (cachedData.length > 0 && cachedData[index]) {
             const oldFlight = cachedData[index];
             if (oldFlight.time !== flight.time || oldFlight.date !== flight.date || oldFlight.flightNumber !== flight.flightNumber) {
@@ -14,8 +15,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // --- NEW: Check if the flight is in the past ---
+        const flightDateTime = new Date(`${flight.date} ${flight.time}`);
+        const now = new Date();
+        const isPast = flightDateTime < now;
+
+        // Create the card container
         const card = document.createElement('div');
-        card.className = `flight-card ${isChanged ? 'changed' : ''}`;
+        
+        // Build the CSS class list dynamically
+        let classNames = ['flight-card'];
+        if (isChanged) classNames.push('changed');
+        if (isPast) classNames.push('past');
+        card.className = classNames.join(' ');
 
         card.innerHTML = `
             ${isChanged ? '<div class="changed-badge">UPDATED</div>' : ''}
