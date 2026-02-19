@@ -290,6 +290,125 @@ const itineraryData = [
     link1Url: "https://www.trenitalia.com/en.html",
     link2Text: "SBB Timetable",
     link2Url: "https://www.sbb.ch/en"
+  },
+  // --- SOUTHEAST ASIA HOTELS (BLANK CANVAS) ---
+  {
+    type: "hotel",
+    title: "Outrigger Khao Lak Beach Resort",
+    reference: "Booking [Update]",
+    startPoint: "Khao Lak, Thailand",
+    endPoint: "Check-out: Mar 11",
+    date: "Mar 5, 2026",
+    time: "3:00 PM",
+    link1Text: "Hotel Info",
+    link1Url: "https://www.google.com/search?q=Outrigger+Khao+Lak+Beach+Resort",
+    link2Text: "Directions",
+    link2Url: "https://www.google.com/maps/search/Outrigger+Khao+Lak+Beach+Resort"
+  },
+  {
+    type: "hotel",
+    title: "Royal River Kwai Resort",
+    reference: "Booking [Update]",
+    startPoint: "Kanchanaburi, Thailand",
+    endPoint: "Check-out: Mar 14",
+    date: "Mar 11, 2026",
+    time: "3:00 PM",
+    link1Text: "Hotel Info",
+    link1Url: "https://www.google.com/search?q=Royal+River+Kwai+Resort",
+    link2Text: "Directions",
+    link2Url: "https://www.google.com/maps/search/Royal+River+Kwai+Resort"
+  },
+  {
+    type: "hotel",
+    title: "Hotel Riva Arun Bangkok",
+    reference: "Booking [Update]",
+    startPoint: "Bangkok, Thailand",
+    endPoint: "Check-out: Mar 19",
+    date: "Mar 14, 2026",
+    time: "3:00 PM",
+    link1Text: "Hotel Info",
+    link1Url: "https://www.google.com/search?q=Hotel+Riva+Arun+Bangkok",
+    link2Text: "Directions",
+    link2Url: "https://www.google.com/maps/search/Hotel+Riva+Arun+Bangkok"
+  },
+  {
+    type: "hotel",
+    title: "The Clan Hotel",
+    reference: "Booking [Update]",
+    startPoint: "Singapore",
+    endPoint: "Check-out: Mar 23",
+    date: "Mar 19, 2026",
+    time: "3:00 PM",
+    link1Text: "Hotel Info",
+    link1Url: "https://www.google.com/search?q=The+Clan+Hotel+Singapore",
+    link2Text: "Directions",
+    link2Url: "https://www.google.com/maps/search/The+Clan+Hotel+Singapore"
+  },
+  {
+    type: "hotel",
+    title: "Salinda Resort Phu Quoc Island",
+    reference: "Booking [Update]",
+    startPoint: "Phu Quoc, Vietnam",
+    endPoint: "Check-out: Mar 26",
+    date: "Mar 23, 2026",
+    time: "3:00 PM",
+    link1Text: "Hotel Info",
+    link1Url: "https://www.google.com/search?q=Salinda+Resort+Phu+Quoc+Island",
+    link2Text: "Directions",
+    link2Url: "https://www.google.com/maps/search/Salinda+Resort+Phu+Quoc+Island"
+  },
+  {
+    type: "hotel",
+    title: "Hotel des Arts Saigon",
+    reference: "Booking [Update]",
+    startPoint: "Ho Chi Minh City, Vietnam",
+    endPoint: "Check-out: Mar 29",
+    date: "Mar 26, 2026",
+    time: "3:00 PM",
+    link1Text: "Hotel Info",
+    link1Url: "https://www.google.com/search?q=Hotel+des+Arts+Saigon",
+    link2Text: "Directions",
+    link2Url: "https://www.google.com/maps/search/Hotel+des+Arts+Saigon"
+  },
+  {
+    type: "hotel",
+    title: "La Siesta Hoi An",
+    reference: "Booking [Update]",
+    startPoint: "Hoi An, Vietnam",
+    endPoint: "Check-out: Apr 1",
+    date: "Mar 29, 2026",
+    time: "3:00 PM",
+    link1Text: "Hotel Info",
+    link1Url: "https://www.google.com/search?q=La+Siesta+Hoi+An",
+    link2Text: "Directions",
+    link2Url: "https://www.google.com/maps/search/La+Siesta+Hoi+An"
+  },
+  {
+    type: "hotel",
+    title: "Silk Path Grand Hue Hotel",
+    reference: "Booking [Update]",
+    startPoint: "Hue, Vietnam",
+    endPoint: "Check-out: Apr 3",
+    date: "Apr 1, 2026",
+    time: "3:00 PM",
+    link1Text: "Hotel Info",
+    link1Url: "https://www.google.com/search?q=Silk+Path+Grand+Hue+Hotel",
+    link2Text: "Directions",
+    link2Url: "https://www.google.com/maps/search/Silk+Path+Grand+Hue+Hotel"
+  },
+  {
+    type: "hotel",
+    title: "La Siesta Premium Hang Be",
+    reference: "Booking [Update]",
+    startPoint: "Hanoi, Vietnam",
+    endPoint: "Check-out: Apr 4",
+    date: "Apr 3, 2026",
+    time: "3:00 PM",
+    link1Text: "Hotel Info",
+    link1Url: "https://www.google.com/search?q=La+Siesta+Premium+Hang+Be",
+    link2Text: "Directions",
+    link2Url: "https://www.google.com/maps/search/La+Siesta+Premium+Hang+Be"
   }
 ];
+
 
