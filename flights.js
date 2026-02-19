@@ -98,5 +98,76 @@ const flightsData = [
     time: "1:05 AM",
     searchQuery: "https://www.google.com/search?q=QR+709+flight+status",
     flightAwareUrl: "https://flightaware.com/live/flight/QR709"
+  },
+  {
+    airline: "SAS",
+    flightNumber: "SK 926",
+    departure: "Dulles",
+    arrival: "Copenhagen",
+    date: "May 13, 2026",
+    time: "8:20 PM",
+    searchQuery: "https://www.google.com/search?q=SK+926+flight+status",
+    flightAwareUrl: "https://flightaware.com/live/flight/SAS926"
+  },
+  {
+    airline: "SAS",
+    flightNumber: "SK 667",
+    departure: "Copenhagen",
+    arrival: "Stuttgart",
+    date: "May 14, 2026",
+    time: "7:05 AM",
+    searchQuery: "https://www.google.com/search?q=SK+667+flight+status",
+    flightAwareUrl: "https://flightaware.com/live/flight/SAS667"
+  },
+  {
+    airline: "SAS",
+    flightNumber: "SK 2692",
+    departure: "Venice",
+    arrival: "Copenhagen",
+    date: "Jun 1, 2026",
+    time: "5:00 AM",
+    searchQuery: "https://www.google.com/search?q=SK+2692+flight+status",
+    flightAwareUrl: "https://flightaware.com/live/flight/SAS2692"
+  },
+  {
+    airline: "SAS",
+    flightNumber: "SK 925",
+    departure: "Copenhagen",
+    arrival: "Dulles",
+    date: "Jun 1, 2026",
+    time: "8:15 AM",
+    searchQuery: "https://www.google.com/search?q=SK+925+flight+status",
+    flightAwareUrl: "https://flightaware.com/live/flight/SAS925"
+  },
+  {
+    airline: "American Airlines",
+    flightNumber: "AA 728",
+    departure: "Philadelphia",
+    arrival: "London",
+    date: "Aug 26, 2026",
+    time: "10:20 PM",
+    searchQuery: "https://www.google.com/search?q=AA+728+flight+status",
+    flightAwareUrl: "https://flightaware.com/live/flight/AA728"
+  },
+  {
+    airline: "American Airlines",
+    flightNumber: "AA 6911",
+    departure: "Philadelphia",
+    arrival: "London",
+    date: "Sep 1, 2026",
+    time: "6:45 PM",
+    searchQuery: "https://www.google.com/search?q=AA+6911+flight+status",
+    flightAwareUrl: "https://flightaware.com/live/flight/AA6911"
+  },
+  {
+    airline: "American Airlines",
+    flightNumber: "AA 759",
+    departure: "Athens",
+    arrival: "Philadelphia",
+    date: "Sep 28, 2026",
+    time: "1:00 PM",
+    searchQuery: "https://www.google.com/search?q=AA+759+flight+status",
+    flightAwareUrl: "https://flightaware.com/live/flight/AA759"
   }
+
 ];
