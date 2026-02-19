@@ -186,10 +186,11 @@ const itineraryData = [
   },
 
   // --- UK / GREECE TRIP ---
-  {
+ {
     type: "flight",
     title: "American Airlines (Kate)",
     reference: "AA 728",
+    pnr: "HBHMVH", // <--- Here is the new PNR line!
     startPoint: "Philadelphia (PHL)",
     endPoint: "London (LHR)",
     date: "Aug 26, 2026",
@@ -203,6 +204,7 @@ const itineraryData = [
     type: "flight",
     title: "American Airlines (Robert)",
     reference: "AA 6911",
+    pnr: "[Update]", // You can use placeholders until you find the code
     startPoint: "Philadelphia (PHL)",
     endPoint: "London (LHR)",
     date: "Sep 1, 2026",
@@ -212,18 +214,20 @@ const itineraryData = [
     link2Text: "FlightAware",
     link2Url: "https://flightaware.com/live/flight/AA6911"
   },
+  // ... (skipping down to the return flight)
   {
-    type: "car",
-    title: "Sixt Rent a Car",
-    reference: "VW Golf (CDAR)",
-    startPoint: "LHR Terminal 5",
-    endPoint: "Return: Sep 10 @ 5:00 PM",
-    date: "Sep 2, 2026",
-    time: "11:00 AM",
-    link1Text: "Manage Booking",
-    link1Url: "https://www.sixt.com/account/#/manage-my-booking-info",
-    link2Text: "LHR T5 Map",
-    link2Url: "https://maps.google.com/?q=Sixt+London+Heathrow+Terminal+5"
+    type: "flight",
+    title: "American Airlines",
+    reference: "AA 759",
+    pnr: "HBHMVH", // The return flight shares the same code
+    startPoint: "Athens (ATH)",
+    endPoint: "Philadelphia (PHL)",
+    date: "Sep 28, 2026",
+    time: "1:00 PM",
+    link1Text: "Google Status",
+    link1Url: "https://www.google.com/search?q=AA+759+flight+status",
+    link2Text: "FlightAware",
+    link2Url: "https://flightaware.com/live/flight/AA759"
   },
   {
     type: "excursion",
@@ -410,5 +414,6 @@ const itineraryData = [
     link2Url: "https://www.google.com/maps/search/La+Siesta+Premium+Hang+Be"
   }
 ];
+
 
 
