@@ -186,11 +186,11 @@ const itineraryData = [
   },
 
   // --- UK / GREECE TRIP ---
- {
+  {
     type: "flight",
     title: "American Airlines (Kate)",
     reference: "AA 728",
-    pnr: "HBHMVH", // <--- Here is the new PNR line!
+    pnr: "HBHMVH", 
     startPoint: "Philadelphia (PHL)",
     endPoint: "London (LHR)",
     date: "Aug 26, 2026",
@@ -204,7 +204,7 @@ const itineraryData = [
     type: "flight",
     title: "American Airlines (Robert)",
     reference: "AA 6911",
-    pnr: "[Update]", // You can use placeholders until you find the code
+    pnr: "LJZUDZ", 
     startPoint: "Philadelphia (PHL)",
     endPoint: "London (LHR)",
     date: "Sep 1, 2026",
@@ -214,20 +214,19 @@ const itineraryData = [
     link2Text: "FlightAware",
     link2Url: "https://flightaware.com/live/flight/AA6911"
   },
-  // ... (skipping down to the return flight)
   {
-    type: "flight",
-    title: "American Airlines",
-    reference: "AA 759",
-    pnr: "HBHMVH", // The return flight shares the same code
-    startPoint: "Athens (ATH)",
-    endPoint: "Philadelphia (PHL)",
-    date: "Sep 28, 2026",
-    time: "1:00 PM",
-    link1Text: "Google Status",
-    link1Url: "https://www.google.com/search?q=AA+759+flight+status",
-    link2Text: "FlightAware",
-    link2Url: "https://flightaware.com/live/flight/AA759"
+    type: "car",
+    title: "Sixt Rent a Car",
+    reference: "VW Golf (CDAR)",
+    pnr: "9728152718",
+    startPoint: "LHR Terminal 5",
+    endPoint: "Return: Sep 10 @ 5:00 PM",
+    date: "Sep 2, 2026",
+    time: "7:00 AM",
+    link1Text: "Manage Booking",
+    link1Url: "https://www.sixt.com/account/#/manage-my-booking-info",
+    link2Text: "LHR T5 Map",
+    link2Url: "https://maps.google.com/?q=Sixt+London+Heathrow+Terminal+5"
   },
   {
     type: "excursion",
@@ -246,6 +245,7 @@ const itineraryData = [
     type: "flight",
     title: "American Airlines",
     reference: "AA 759",
+    pnr: "HBHMVH / LJZUDZ", 
     startPoint: "Athens (ATH)",
     endPoint: "Philadelphia (PHL)",
     date: "Sep 28, 2026",
@@ -255,6 +255,7 @@ const itineraryData = [
     link2Text: "FlightAware",
     link2Url: "https://flightaware.com/live/flight/AA759"
   },
+
   // --- EUROPEAN RAIL JOURNEY ---
   {
     type: "train",
@@ -262,8 +263,8 @@ const itineraryData = [
     reference: "ICE / EC [Update]",
     startPoint: "Stuttgart Hbf",
     endPoint: "Lucerne",
-    date: "May 18, 2026", // Update with your actual travel date
-    time: "10:00 AM",     // Update with your actual departure time
+    date: "May 18, 2026", 
+    time: "10:00 AM",     
     link1Text: "DB Live Status",
     link1Url: "https://int.bahn.de/en/",
     link2Text: "SBB Timetable",
@@ -275,8 +276,8 @@ const itineraryData = [
     reference: "IC [Update]",
     startPoint: "Lucerne",
     endPoint: "Lugano",
-    date: "May 22, 2026", // Update with your actual travel date
-    time: "11:00 AM",     // Update with your actual departure time
+    date: "May 22, 2026", 
+    time: "11:00 AM",     
     link1Text: "SBB Live Status",
     link1Url: "https://www.sbb.ch/en",
     link2Text: "Station Map",
@@ -288,13 +289,14 @@ const itineraryData = [
     reference: "EC [Update]",
     startPoint: "Lugano",
     endPoint: "Venice S. Lucia",
-    date: "May 26, 2026", // Update with your actual travel date
-    time: "09:30 AM",     // Update with your actual departure time
+    date: "May 26, 2026", 
+    time: "09:30 AM",     
     link1Text: "Trenitalia Status",
     link1Url: "https://www.trenitalia.com/en.html",
     link2Text: "SBB Timetable",
     link2Url: "https://www.sbb.ch/en"
   },
+
   // --- SOUTHEAST ASIA HOTELS (BLANK CANVAS) ---
   {
     type: "hotel",
@@ -307,155 +309,4 @@ const itineraryData = [
     link1Text: "Hotel Info",
     link1Url: "https://www.google.com/search?q=Outrigger+Khao+Lak+Beach+Resort",
     link2Text: "Directions",
-    link2Url: "https://www.google.com/maps/search/Outrigger+Khao+Lak+Beach+Resort"
-  },
-  {
-    type: "hotel",
-    title: "Royal River Kwai Resort",
-    reference: "Booking [Update]",
-    startPoint: "Kanchanaburi, Thailand",
-    endPoint: "Check-out: Mar 14",
-    date: "Mar 11, 2026",
-    time: "3:00 PM",
-    link1Text: "Hotel Info",
-    link1Url: "https://www.google.com/search?q=Royal+River+Kwai+Resort",
-    link2Text: "Directions",
-    link2Url: "https://www.google.com/maps/search/Royal+River+Kwai+Resort"
-  },
-  {
-    type: "hotel",
-    title: "Hotel Riva Arun Bangkok",
-    reference: "Booking [Update]",
-    startPoint: "Bangkok, Thailand",
-    endPoint: "Check-out: Mar 19",
-    date: "Mar 14, 2026",
-    time: "3:00 PM",
-    link1Text: "Hotel Info",
-    link1Url: "https://www.google.com/search?q=Hotel+Riva+Arun+Bangkok",
-    link2Text: "Directions",
-    link2Url: "https://www.google.com/maps/search/Hotel+Riva+Arun+Bangkok"
-  },
-  {
-    type: "hotel",
-    title: "The Clan Hotel",
-    reference: "Booking [Update]",
-    startPoint: "Singapore",
-    endPoint: "Check-out: Mar 23",
-    date: "Mar 19, 2026",
-    time: "3:00 PM",
-    link1Text: "Hotel Info",
-    link1Url: "https://www.google.com/search?q=The+Clan+Hotel+Singapore",
-    link2Text: "Directions",
-    link2Url: "https://www.google.com/maps/search/The+Clan+Hotel+Singapore"
-  },
-  {
-    type: "hotel",
-    title: "Salinda Resort Phu Quoc Island",
-    reference: "Booking [Update]",
-    startPoint: "Phu Quoc, Vietnam",
-    endPoint: "Check-out: Mar 26",
-    date: "Mar 23, 2026",
-    time: "3:00 PM",
-    link1Text: "Hotel Info",
-    link1Url: "https://www.google.com/search?q=Salinda+Resort+Phu+Quoc+Island",
-    link2Text: "Directions",
-    link2Url: "https://www.google.com/maps/search/Salinda+Resort+Phu+Quoc+Island"
-  },
-  {
-    type: "hotel",
-    title: "Hotel des Arts Saigon",
-    reference: "Booking [Update]",
-    startPoint: "Ho Chi Minh City, Vietnam",
-    endPoint: "Check-out: Mar 29",
-    date: "Mar 26, 2026",
-    time: "3:00 PM",
-    link1Text: "Hotel Info",
-    link1Url: "https://www.google.com/search?q=Hotel+des+Arts+Saigon",
-    link2Text: "Directions",
-    link2Url: "https://www.google.com/maps/search/Hotel+des+Arts+Saigon"
-  },
-  {
-    type: "hotel",
-    title: "La Siesta Hoi An",
-    reference: "Booking [Update]",
-    startPoint: "Hoi An, Vietnam",
-    endPoint: "Check-out: Apr 1",
-    date: "Mar 29, 2026",
-    time: "3:00 PM",
-    link1Text: "Hotel Info",
-    link1Url: "https://www.google.com/search?q=La+Siesta+Hoi+An",
-    link2Text: "Directions",
-    link2Url: "https://www.google.com/maps/search/La+Siesta+Hoi+An"
-  },
-  {
-    type: "hotel",
-    title: "Silk Path Grand Hue Hotel",
-    reference: "Booking [Update]",
-    startPoint: "Hue, Vietnam",
-    endPoint: "Check-out: Apr 3",
-    date: "Apr 1, 2026",
-    time: "3:00 PM",
-    link1Text: "Hotel Info",
-    link1Url: "https://www.google.com/search?q=Silk+Path+Grand+Hue+Hotel",
-    link2Text: "Directions",
-    link2Url: "https://www.google.com/maps/search/Silk+Path+Grand+Hue+Hotel"
-  },
-  {
-    type: "hotel",
-    title: "La Siesta Premium Hang Be",
-    reference: "Booking [Update]",
-    startPoint: "Hanoi, Vietnam",
-    endPoint: "Check-out: Apr 4",
-    date: "Apr 3, 2026",
-    time: "3:00 PM",
-    link1Text: "Hotel Info",
-    link1Url: "https://www.google.com/search?q=La+Siesta+Premium+Hang+Be",
-    link2Text: "Directions",
-    link2Url: "https://www.google.com/maps/search/La+Siesta+Premium+Hang+Be"
-  },
-  {
-    type: "car",
-    title: "Sixt Rent a Car",
-    reference: "VW Golf (CDAR)",
-    startPoint: "LHR Terminal 5",
-    endPoint: "Return: Sep 10 @ 5:00 PM",
-    date: "Sep 2, 2026",
-    time: "11:00 AM",
-    link1Text: "Manage Booking",
-    link1Url: "https://www.sixt.com/account/#/manage-my-booking-info",
-    link2Text: "LHR T5 Map",
-    link2Url: "https://maps.google.com/?q=Sixt+London+Heathrow+Terminal+5"
-  },
-  // --- BARBADOS TRIP (PAST) ---
-  {
-    type: "flight",
-    title: "American Airlines",
-    reference: "AA [Update]",
-    startPoint: "Philadelphia (PHL)",
-    endPoint: "Barbados (BGI)",
-    date: "Jan 24, 2026",
-    time: "12:00 PM", 
-    link1Text: "Google Status",
-    link1Url: "https://www.google.com/search?q=AA+[Update]+flight+status",
-    link2Text: "FlightAware",
-    link2Url: "https://flightaware.com/live/flight/AA[Update]"
-  },
-  {
-    type: "flight",
-    title: "American Airlines",
-    reference: "AA [Update]",
-    startPoint: "Barbados (BGI)",
-    endPoint: "Philadelphia (PHL)",
-    date: "Feb 6, 2026",
-    time: "12:00 PM", 
-    link1Text: "Google Status",
-    link1Url: "https://www.google.com/search?q=AA+[Update]+flight+status",
-    link2Text: "FlightAware",
-    link2Url: "https://flightaware.com/live/flight/AA[Update]"
-  }
-];
-
-
-
-
-
+    link2Url: "http://googleusercontent
