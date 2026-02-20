@@ -66,22 +66,7 @@ header {
     opacity: 0.6;
 }
 
-.flight-card.changed {
-    border: 3px solid #ffba08;
-    position: relative;
-}
 
-.changed-badge {
-    background-color: #ffba08;
-    color: #000;
-    font-size: 0.7em;
-    font-weight: bold;
-    padding: 4px 8px;
-    border-radius: 4px;
-    position: absolute;
-    top: -12px;
-    right: 15px;
-}
 
 /* Compact Summary Row */
 .card-summary {
@@ -204,3 +189,4 @@ header {
 .action-btn:active {
     opacity: 0.8;
 }
+
