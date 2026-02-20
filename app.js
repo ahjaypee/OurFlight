@@ -1,9 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('itinerary-container');
-    const filterBtns = document.querySelectorAll('.filter-btn');
+    const categoryBtns = document.querySelectorAll('.category-btn');
+    const timeBtns = document.querySelectorAll('.time-btn');
     
-    // NEW: Load hidden items from local storage (so it persists between visits)
     let hiddenItems = JSON.parse(localStorage.getItem('hiddenItineraryItems')) || [];
+    
+    // Track both filter states
+    let currentCategory = 'all';
+    let currentTime = 'all';
 
     const typeIcons = {
         flight: '✈️',
@@ -18,31 +22,55 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    // Sort chronologically
     itineraryData.sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
 
-    function renderCards(filterType = 'all') {
+    function renderCards() {
         container.innerHTML = ''; 
 
+        // Establish our time boundaries based on the current moment
+        const now = new Date();
+        
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+        
+        const tomorrowStart = new Date(todayStart);
+        tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+        const tomorrowEnd = new Date(todayEnd);
+        tomorrowEnd.setDate(tomorrowEnd.getDate() + 1);
+        
+        const day3End = new Date(todayEnd);
+        day3End.setDate(day3End.getDate() + 3);
+
         itineraryData.forEach((item) => {
-            // Create a unique ID for each item so we know exactly which one to hide
+            const itemDateTime = new Date(`${item.date} ${item.time}`);
             const itemId = item.reference + item.date;
             const isHidden = hiddenItems.includes(itemId);
-
-            // NEW: Filtering logic for hidden items
-            if (filterType === 'hidden') {
-                if (!isHidden) return; // Only show hidden items in the 'hidden' tab
-            } else {
-                if (isHidden) return; // Hide these items from all other tabs
-                if (filterType !== 'all' && item.type !== filterType) return; // Standard category filter
-            }
-
-            const itemDateTime = new Date(`${item.date} ${item.time}`);
-            const now = new Date();
             const isPast = itemDateTime < now;
 
+            // 1. Check Category Match
+            if (currentCategory === 'hidden') {
+                if (!isHidden) return; 
+            } else {
+                if (isHidden) return; 
+                if (currentCategory !== 'all' && item.type !== currentCategory) return; 
+            }
+
+            // 2. Check Time Match
+            if (currentTime !== 'all') {
+                let timeMatch = false;
+                if (currentTime === 'day0') {
+                    timeMatch = (itemDateTime >= todayStart && itemDateTime <= todayEnd);
+                } else if (currentTime === 'day1') {
+                    timeMatch = (itemDateTime >= tomorrowStart && itemDateTime <= tomorrowEnd);
+                } else if (currentTime === 'day3') {
+                    timeMatch = (itemDateTime >= now && itemDateTime <= day3End);
+                }
+                
+                if (!timeMatch) return; // Skip if it doesn't fit the time filter
+            }
+
+            // Build the card
             const card = document.createElement('div');
-            
             let classNames = ['flight-card'];
             if (isPast) classNames.push('past');
             card.className = classNames.join(' ');
@@ -52,7 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.classList.toggle('expanded');
             });
 
-            // Set up the hide/unhide button ONLY if the event is in the past
             let hideBtnHTML = '';
             if (isPast) {
                 if (isHidden) {
@@ -62,7 +89,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // Set up the Weather button for hotels
             let weatherBtnHTML = '';
             if (item.type === 'hotel') {
                 weatherBtnHTML = `<a href="https://www.google.com/search?q=current+weather+${encodeURIComponent(item.startPoint)}" target="_blank" class="action-btn weather-btn">⛅ Weather</a>`;
@@ -98,34 +124,37 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Handle standard filter button clicks
-    filterBtns.forEach(btn => {
+    // Handle Category Filter Clicks
+    categoryBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
-            filterBtns.forEach(b => b.classList.remove('active'));
+            categoryBtns.forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
-            renderCards(e.target.dataset.filter);
+            currentCategory = e.target.dataset.category;
+            renderCards();
         });
     });
 
-    // NEW: Listen for clicks on the Hide/Unhide buttons
+    // Handle Time Filter Clicks
+    timeBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            timeBtns.forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            currentTime = e.target.dataset.time;
+            renderCards();
+        });
+    });
+
+    // Handle Hide/Unhide Clicks
     container.addEventListener('click', (e) => {
         if (e.target.classList.contains('toggle-hide-btn')) {
             const itemId = e.target.getAttribute('data-id');
-            
             if (hiddenItems.includes(itemId)) {
-                // Remove from hidden list
                 hiddenItems = hiddenItems.filter(id => id !== itemId);
             } else {
-                // Add to hidden list
                 hiddenItems.push(itemId);
             }
-            
-            // Save to the phone's local storage
             localStorage.setItem('hiddenItineraryItems', JSON.stringify(hiddenItems));
-            
-            // Re-draw the screen in whatever filter tab you are currently looking at
-            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
-            renderCards(activeFilter);
+            renderCards();
         }
     });
 
