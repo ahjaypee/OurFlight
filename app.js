@@ -142,7 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.classList.toggle('expanded');
             });
 
-            // UPDATED: Using the new small-hide-btn class
             let hideBtnHTML = '';
             if (isPast) {
                 hideBtnHTML = isHidden 
@@ -161,11 +160,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 calBtnHTML = `<a href="${calLink}" target="_blank" class="action-btn calendar-btn track-calendar-btn" data-id="${itemId}">📅 Calendar</a>`;
             }
 
+            // NEW: Modern Dashboard Colors for the timezone offsets
+            let hrOffsetBadge = '';
+            if (item.hrOffset) {
+                let badgeBg = '#e2e8f0'; // Default muted gray fallback
+                let badgeText = '#475569';
+                
+                if (item.hrOffset.includes('+')) {
+                    badgeBg = '#dbeafe'; // Soft cool blue
+                    badgeText = '#1e40af';
+                } else if (item.hrOffset.includes('-')) {
+                    badgeBg = '#f3e8ff'; // Soft muted mauve/purple
+                    badgeText = '#6b21a8';
+                }
+                
+                hrOffsetBadge = ` <span style="color:${badgeText}; font-weight:bold; font-size:0.85em; background-color:${badgeBg}; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">⏱️ ${item.hrOffset}</span>`;
+            }
+
             const timeZoneBadge = item.timeZone ? ` <span style="font-size:0.85em; color:#888;">${item.timeZone}</span>` : '';
-            const hrOffsetBadge = item.hrOffset ? ` <span style="color:#00838f; font-weight:bold; font-size:0.85em; background-color:#e0f7fa; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">⏱️ ${item.hrOffset}</span>` : '';
             const nextDayBadge = item.dayOffset ? ` <span style="color:#f77f00; font-weight:bold; font-size:0.85em; margin-left: 4px;">${item.dayOffset} Day</span>` : '';
 
-            // UPDATED: We added flex styling directly to details-header to keep things aligned and inserted the hideBtnHTML there.
             card.innerHTML = `
                 <div class="card-summary">
                     <div class="summary-icon">${typeIcons[item.type] || '📍'}</div>
@@ -179,50 +193,4 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="card-details">
                     <div class="details-header" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                         <div class="flight-number">${item.reference}</div>
-                        ${item.pnr ? `<div class="pnr-badge">PNR: ${item.pnr}</div>` : ''}
-                        ${hideBtnHTML}
-                    </div>
-                    <div class="airline">${item.title}</div>
-                    
-                    <div class="button-group">
-                        <a href="${item.link1Url}" target="_blank" class="action-btn primary-btn">${item.link1Text}</a>
-                        <a href="${item.link2Url}" target="_blank" class="action-btn secondary-btn">${item.link2Text}</a>
-                        ${weatherBtnHTML}
-                        ${calBtnHTML}
-                    </div>
-                </div>
-            `;
-
-            container.appendChild(card);
-        });
-    }
-
-    categoryBtns.forEach(btn => { btn.addEventListener('click', (e) => { categoryBtns.forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentCategory = e.target.dataset.category; renderCards(); }); });
-    timeBtns.forEach(btn => { btn.addEventListener('click', (e) => { timeBtns.forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentTime = e.target.dataset.time; renderCards(); }); });
-    
-    container.addEventListener('click', (e) => { 
-        if (e.target.classList.contains('toggle-hide-btn')) { 
-            const itemId = e.target.getAttribute('data-id'); 
-            if (hiddenItems.includes(itemId)) hiddenItems = hiddenItems.filter(id => id !== itemId); 
-            else hiddenItems.push(itemId); 
-            localStorage.setItem('hiddenItineraryItems', JSON.stringify(hiddenItems)); 
-            renderCards(); 
-            renderCountdown(); 
-        } 
-        
-        const trackCalBtn = e.target.closest('.track-calendar-btn');
-        if (trackCalBtn) {
-            const itemId = trackCalBtn.getAttribute('data-id');
-            if (!addedCalendarItems.includes(itemId)) {
-                addedCalendarItems.push(itemId);
-                localStorage.setItem('addedCalendarItems', JSON.stringify(addedCalendarItems));
-                
-                trackCalBtn.classList.remove('calendar-btn', 'track-calendar-btn');
-                trackCalBtn.classList.add('calendar-added-btn');
-                trackCalBtn.innerHTML = '✅ Added';
-            }
-        }
-    });
-
-    initApp();
-});
+                        ${item.pnr ? `<div class="pnr-badge">PNR: ${item.pnr}</div>` : ''
