@@ -4,27 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Travel Itinerary</title>
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
     <header>
         <h1>Upcoming Itinerary</h1>
         
         <div class="filter-bar">
-            <button class="filter-btn active" data-filter="all">All</button>
-            <button class="filter-btn" data-filter="flight">✈️ Flights</button>
-            <button class="filter-btn" data-filter="train">🚆 Trains</button>
-            <button class="filter-btn" data-filter="car">🚗 Cars</button>
-            <button class="filter-btn" data-filter="hotel">🏨 Hotels</button>
-            <button class="filter-btn" data-filter="excursion">🍳 Excursions</button>
-            <button class="filter-btn" data-filter="hidden">👻 Hidden</button>
+            <button class="filter-btn category-btn active" data-category="all">All</button>
+            <button class="filter-btn category-btn" data-category="flight">✈️ Flights</button>
+            <button class="filter-btn category-btn" data-category="train">🚆 Trains</button>
+            <button class="filter-btn category-btn" data-category="car">🚗 Cars</button>
+            <button class="filter-btn category-btn" data-category="hotel">🏨 Hotels</button>
+            <button class="filter-btn category-btn" data-category="excursion">🍳 Excursions</button>
+            <button class="filter-btn category-btn" data-category="hidden">👻 Hidden</button>
+        </div>
+
+        <div class="filter-bar time-bar">
+            <button class="filter-btn time-btn active" data-time="all">Any Time</button>
+            <button class="filter-btn time-btn" data-time="day0">Day 0</button>
+            <button class="filter-btn time-btn" data-time="day1">Day+1</button>
+            <button class="filter-btn time-btn" data-time="day3">Day+3</button>
         </div>
     </header>
     
     <main id="itinerary-container">
         </main>
 
-    <script src="data.js?v=5"></script>
-    <script src="app.js?v=5"></script>
+    <script src="data.js?v=6"></script>
+    <script src="app.js?v=6"></script>
 </body>
 </html>
