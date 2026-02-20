@@ -2,6 +2,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('itinerary-container');
     const filterBtns = document.querySelectorAll('.filter-btn');
     
+    // NEW: Load hidden items from local storage (so it persists between visits)
+    let hiddenItems = JSON.parse(localStorage.getItem('hiddenItineraryItems')) || [];
+
     const typeIcons = {
         flight: '✈️',
         train: '🚆',
@@ -22,7 +25,17 @@ document.addEventListener('DOMContentLoaded', () => {
         container.innerHTML = ''; 
 
         itineraryData.forEach((item) => {
-            if (filterType !== 'all' && item.type !== filterType) return;
+            // Create a unique ID for each item so we know exactly which one to hide
+            const itemId = item.reference + item.date;
+            const isHidden = hiddenItems.includes(itemId);
+
+            // NEW: Filtering logic for hidden items
+            if (filterType === 'hidden') {
+                if (!isHidden) return; // Only show hidden items in the 'hidden' tab
+            } else {
+                if (isHidden) return; // Hide these items from all other tabs
+                if (filterType !== 'all' && item.type !== filterType) return; // Standard category filter
+            }
 
             const itemDateTime = new Date(`${item.date} ${item.time}`);
             const now = new Date();
@@ -34,11 +47,26 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isPast) classNames.push('past');
             card.className = classNames.join(' ');
 
-            // Make the card clickable to toggle expansion
             card.addEventListener('click', (e) => {
                 if (e.target.closest('.action-btn')) return;
                 card.classList.toggle('expanded');
             });
+
+            // Set up the hide/unhide button ONLY if the event is in the past
+            let hideBtnHTML = '';
+            if (isPast) {
+                if (isHidden) {
+                    hideBtnHTML = `<button class="action-btn toggle-hide-btn" data-id="${itemId}">👁️ Unhide</button>`;
+                } else {
+                    hideBtnHTML = `<button class="action-btn toggle-hide-btn" data-id="${itemId}">👻 Hide</button>`;
+                }
+            }
+
+            // Set up the Weather button for hotels
+            let weatherBtnHTML = '';
+            if (item.type === 'hotel') {
+                weatherBtnHTML = `<a href="https://www.google.com/search?q=current+weather+${encodeURIComponent(item.startPoint)}" target="_blank" class="action-btn weather-btn">⛅ Weather</a>`;
+            }
 
             card.innerHTML = `
                 <div class="card-summary">
@@ -57,10 +85,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="airline">${item.title}</div>
                     
-                <div class="button-group">
+                    <div class="button-group">
                         <a href="${item.link1Url}" target="_blank" class="action-btn primary-btn">${item.link1Text}</a>
                         <a href="${item.link2Url}" target="_blank" class="action-btn secondary-btn">${item.link2Text}</a>
-                        ${item.type === 'hotel' ? `<a href="https://www.google.com/search?q=current+weather+${encodeURIComponent(item.startPoint)}" target="_blank" class="action-btn weather-btn">⛅ Weather</a>` : ''}
+                        ${weatherBtnHTML}
+                        ${hideBtnHTML}
                     </div>
                 </div>
             `;
@@ -69,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Handle standard filter button clicks
     filterBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             filterBtns.forEach(b => b.classList.remove('active'));
@@ -77,6 +107,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // NEW: Listen for clicks on the Hide/Unhide buttons
+    container.addEventListener('click', (e) => {
+        if (e.target.classList.contains('toggle-hide-btn')) {
+            const itemId = e.target.getAttribute('data-id');
+            
+            if (hiddenItems.includes(itemId)) {
+                // Remove from hidden list
+                hiddenItems = hiddenItems.filter(id => id !== itemId);
+            } else {
+                // Add to hidden list
+                hiddenItems.push(itemId);
+            }
+            
+            // Save to the phone's local storage
+            localStorage.setItem('hiddenItineraryItems', JSON.stringify(hiddenItems));
+            
+            // Re-draw the screen in whatever filter tab you are currently looking at
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            renderCards(activeFilter);
+        }
+    });
+
     renderCards();
 });
-
