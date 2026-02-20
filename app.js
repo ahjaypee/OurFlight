@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQve_ZOhcMNg5ITqIvTuIHH_Pcy6pRRoyGw691MvqTVilIC7FzFHGxycf-svHjbItJBp--BTG37Xlui/pub?output=csv';
     
     let hiddenItems = JSON.parse(localStorage.getItem('hiddenItineraryItems')) || [];
-    // NEW: Memory bank for calendar clicks
     let addedCalendarItems = JSON.parse(localStorage.getItem('addedCalendarItems')) || [];
     
     let currentCategory = 'all';
@@ -139,21 +138,21 @@ document.addEventListener('DOMContentLoaded', () => {
             card.className = classNames.join(' ');
 
             card.addEventListener('click', (e) => {
-                if (e.target.closest('.action-btn')) return;
+                if (e.target.closest('.action-btn') || e.target.closest('.small-hide-btn')) return;
                 card.classList.toggle('expanded');
             });
 
+            // UPDATED: Using the new small-hide-btn class
             let hideBtnHTML = '';
             if (isPast) {
                 hideBtnHTML = isHidden 
-                    ? `<button class="action-btn toggle-hide-btn" data-id="${itemId}">👁️ Unhide</button>` 
-                    : `<button class="action-btn toggle-hide-btn" data-id="${itemId}">👻 Hide</button>`;
+                    ? `<button class="small-hide-btn toggle-hide-btn" data-id="${itemId}">👁️ Unhide</button>` 
+                    : `<button class="small-hide-btn toggle-hide-btn" data-id="${itemId}">👻 Hide</button>`;
             }
 
             let weatherLocation = (item.type === 'flight' || item.type === 'train') ? item.endPoint : item.startPoint;
             let weatherBtnHTML = `<a href="https://www.google.com/search?q=current+weather+${encodeURIComponent(weatherLocation)}" target="_blank" class="action-btn weather-btn">⛅ Weather</a>`;
 
-            // NEW: Check memory bank and generate the appropriate Calendar button
             const calLink = generateCalendarLink(item);
             let calBtnHTML = '';
             if (addedCalendarItems.includes(itemId)) {
@@ -166,6 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const hrOffsetBadge = item.hrOffset ? ` <span style="color:#00838f; font-weight:bold; font-size:0.85em; background-color:#e0f7fa; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">⏱️ ${item.hrOffset}</span>` : '';
             const nextDayBadge = item.dayOffset ? ` <span style="color:#f77f00; font-weight:bold; font-size:0.85em; margin-left: 4px;">${item.dayOffset} Day</span>` : '';
 
+            // UPDATED: We added flex styling directly to details-header to keep things aligned and inserted the hideBtnHTML there.
             card.innerHTML = `
                 <div class="card-summary">
                     <div class="summary-icon">${typeIcons[item.type] || '📍'}</div>
@@ -177,9 +177,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
 
                 <div class="card-details">
-                    <div class="details-header">
+                    <div class="details-header" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                         <div class="flight-number">${item.reference}</div>
                         ${item.pnr ? `<div class="pnr-badge">PNR: ${item.pnr}</div>` : ''}
+                        ${hideBtnHTML}
                     </div>
                     <div class="airline">${item.title}</div>
                     
@@ -188,7 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         <a href="${item.link2Url}" target="_blank" class="action-btn secondary-btn">${item.link2Text}</a>
                         ${weatherBtnHTML}
                         ${calBtnHTML}
-                        ${hideBtnHTML}
                     </div>
                 </div>
             `;
@@ -200,9 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
     categoryBtns.forEach(btn => { btn.addEventListener('click', (e) => { categoryBtns.forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentCategory = e.target.dataset.category; renderCards(); }); });
     timeBtns.forEach(btn => { btn.addEventListener('click', (e) => { timeBtns.forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentTime = e.target.dataset.time; renderCards(); }); });
     
-    // Updated click listener to handle both Hide and Calendar clicks
     container.addEventListener('click', (e) => { 
-        // Hide Button Logic
         if (e.target.classList.contains('toggle-hide-btn')) { 
             const itemId = e.target.getAttribute('data-id'); 
             if (hiddenItems.includes(itemId)) hiddenItems = hiddenItems.filter(id => id !== itemId); 
@@ -212,7 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCountdown(); 
         } 
         
-        // NEW: Calendar Button Tracking Logic
         const trackCalBtn = e.target.closest('.track-calendar-btn');
         if (trackCalBtn) {
             const itemId = trackCalBtn.getAttribute('data-id');
@@ -220,7 +217,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 addedCalendarItems.push(itemId);
                 localStorage.setItem('addedCalendarItems', JSON.stringify(addedCalendarItems));
                 
-                // Instantly update the button visually without interrupting the link opening
                 trackCalBtn.classList.remove('calendar-btn', 'track-calendar-btn');
                 trackCalBtn.classList.add('calendar-added-btn');
                 trackCalBtn.innerHTML = '✅ Added';
