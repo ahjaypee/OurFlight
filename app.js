@@ -3,13 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const categoryBtns = document.querySelectorAll('.category-btn');
     const timeBtns = document.querySelectorAll('.time-btn');
     
-    // This is the live link to your Google Sheet!
+    // Your live Google Sheet link
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQve_ZOhcMNg5ITqIvTuIHH_Pcy6pRRoyGw691MvqTVilIC7FzFHGxycf-svHjbItJBp--BTG37Xlui/pub?output=csv';
     
     let hiddenItems = JSON.parse(localStorage.getItem('hiddenItineraryItems')) || [];
     let currentCategory = 'all';
     let currentTime = 'all';
-    let itineraryData = []; // Will be populated from Google Sheets
+    let itineraryData = []; 
 
     const typeIcons = {
         flight: '✈️',
@@ -19,24 +19,19 @@ document.addEventListener('DOMContentLoaded', () => {
         excursion: '🍳'
     };
 
-    // 1. Fetch Data from Google Sheets
     async function initApp() {
         try {
             const response = await fetch(sheetUrl);
             const csvText = await response.text();
             
             itineraryData = parseCSV(csvText);
-            
-            // Sort chronologically
             itineraryData.sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
-            
             renderCards();
         } catch (error) {
             container.innerHTML = '<p style="text-align:center; padding: 30px; color: #ffba08;">⚠️ Could not load data from Google Sheets. Check your internet connection.</p>';
         }
     }
 
-    // 2. Custom CSV Parser
     function parseCSV(str) {
         const rows = [];
         let row = [];
@@ -76,7 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return data;
     }
 
-    // 3. Render the Cards
     function renderCards() {
         container.innerHTML = ''; 
 
@@ -142,16 +136,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             let weatherBtnHTML = `<a href="https://www.google.com/search?q=current+weather+${encodeURIComponent(weatherLocation)}" target="_blank" class="action-btn weather-btn">⛅ Weather</a>`;
 
-            // Setup new visual badges
+            // Setup visual badges
             const timeZoneBadge = item.timeZone ? ` <span style="font-size:0.85em; color:#888;">${item.timeZone}</span>` : '';
-            const nextDayBadge = item.dayOffset ? ` <span style="color:#f77f00; font-weight:bold; font-size:0.85em;">${item.dayOffset} Day</span>` : '';
+            // NEW: Hours offset badge
+            const hrOffsetBadge = item.hrOffset ? ` <span style="color:#00838f; font-weight:bold; font-size:0.85em; background-color:#e0f7fa; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">⏱️ ${item.hrOffset}</span>` : '';
+            const nextDayBadge = item.dayOffset ? ` <span style="color:#f77f00; font-weight:bold; font-size:0.85em; margin-left: 4px;">${item.dayOffset} Day</span>` : '';
 
             card.innerHTML = `
                 <div class="card-summary">
                     <div class="summary-icon">${typeIcons[item.type] || '📍'}</div>
                     <div class="summary-route">
                         <div class="route-text">${item.startPoint} ➔ ${item.endPoint}</div>
-                        <div class="route-date">${item.date} • ${item.time}${timeZoneBadge}${nextDayBadge}</div>
+                        <div class="route-date">${item.date} • ${item.time}${timeZoneBadge}${hrOffsetBadge}${nextDayBadge}</div>
                     </div>
                     <div class="expand-icon">▼</div>
                 </div>
@@ -176,7 +172,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Event Listeners
     categoryBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             categoryBtns.forEach(b => b.classList.remove('active'));
@@ -208,6 +203,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Boot up the app
     initApp();
 });
