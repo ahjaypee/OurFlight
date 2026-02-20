@@ -218,4 +218,37 @@ header {
     border: 1px solid #dadce0;
     cursor: pointer;
 }
+/* Countdown Dashboard Styles */
+.countdown-banner {
+    background: linear-gradient(135deg, #1b263b, #415a77);
+    color: white;
+    padding: 15px;
+    border-radius: 12px;
+    margin: 5px 15px 15px 15px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    display: none; /* Hidden until Javascript finds an upcoming event */
+}
+
+.countdown-title {
+    font-size: 0.9em;
+    color: #e0e1dd;
+    margin-bottom: 5px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.countdown-timer {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #f77f00;
+}
+
+/* Calendar Button Style */
+.calendar-btn {
+    background-color: #f3e5f5;
+    color: #6a1b9a;
+    border: 1px solid #ce93d8;
+}
 
