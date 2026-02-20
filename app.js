@@ -57,9 +57,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="airline">${item.title}</div>
                     
-                    <div class="button-group">
+                <div class="button-group">
                         <a href="${item.link1Url}" target="_blank" class="action-btn primary-btn">${item.link1Text}</a>
                         <a href="${item.link2Url}" target="_blank" class="action-btn secondary-btn">${item.link2Text}</a>
+                        ${item.type === 'hotel' ? `<a href="https://www.google.com/search?q=current+weather+${encodeURIComponent(item.startPoint)}" target="_blank" class="action-btn weather-btn">⛅ Weather</a>` : ''}
                     </div>
                 </div>
             `;
@@ -78,3 +79,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     renderCards();
 });
+
