@@ -258,4 +258,16 @@ header {
     color: #2e7d32;
     border: 1px solid #a5d6a7;
 }
+/* Mini Hide Button for the Header Row */
+.small-hide-btn {
+    background-color: #f1f3f4;
+    color: #5f6368;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.8em;
+    font-weight: bold;
+    cursor: pointer;
+    margin-left: auto; /* This pushes it perfectly to the far right side */
+}
 
