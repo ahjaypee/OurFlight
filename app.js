@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQve_ZOhcMNg5ITqIvTuIHH_Pcy6pRRoyGw691MvqTVilIC7FzFHGxycf-svHjbItJBp--BTG37Xlui/pub?output=csv';
     
     let hiddenItems = JSON.parse(localStorage.getItem('hiddenItineraryItems')) || [];
+    // NEW: Memory bank for calendar clicks
+    let addedCalendarItems = JSON.parse(localStorage.getItem('addedCalendarItems')) || [];
+    
     let currentCategory = 'all';
     let currentTime = 'all';
     let itineraryData = []; 
@@ -23,8 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             renderCards();
             renderCountdown(); 
-            
-            // Keep the countdown ticking every 60 seconds!
             setInterval(renderCountdown, 60000); 
         } catch (error) {
             container.innerHTML = '<p style="text-align:center; padding: 30px; color: #ffba08;">⚠️ Could not load data from Google Sheets.</p>';
@@ -56,15 +57,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return data;
     }
 
-    // NEW: Calculate and build the Calendar URL
     function generateCalendarLink(item) {
         const itemDate = new Date(`${item.date} ${item.time}`);
-        
-        // Google Calendar needs dates formatted as YYYYMMDDTHHMMSS
         const pad = (n) => n < 10 ? '0' + n : n;
         const startStr = `${itemDate.getFullYear()}${pad(itemDate.getMonth()+1)}${pad(itemDate.getDate())}T${pad(itemDate.getHours())}${pad(itemDate.getMinutes())}00`;
-        
-        // Since we don't track end times, we default the calendar block to 2 hours long
         const endDate = new Date(itemDate.getTime() + 2 * 60 * 60 * 1000);
         const endStr = `${endDate.getFullYear()}${pad(endDate.getMonth()+1)}${pad(endDate.getDate())}T${pad(endDate.getHours())}${pad(endDate.getMinutes())}00`;
 
@@ -75,11 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${details}&location=${location}`;
     }
 
-    // NEW: Dashboard Countdown Logic
     function renderCountdown() {
         const now = new Date();
-        
-        // Find the absolute next event in the timeline that isn't hidden
         const nextEvent = itineraryData.find(item => {
             const itemDate = new Date(`${item.date} ${item.time}`);
             const itemId = item.reference + item.date;
@@ -160,9 +153,14 @@ document.addEventListener('DOMContentLoaded', () => {
             let weatherLocation = (item.type === 'flight' || item.type === 'train') ? item.endPoint : item.startPoint;
             let weatherBtnHTML = `<a href="https://www.google.com/search?q=current+weather+${encodeURIComponent(weatherLocation)}" target="_blank" class="action-btn weather-btn">⛅ Weather</a>`;
 
-            // Setup new Calendar button
+            // NEW: Check memory bank and generate the appropriate Calendar button
             const calLink = generateCalendarLink(item);
-            const calBtnHTML = `<a href="${calLink}" target="_blank" class="action-btn calendar-btn">📅 Calendar</a>`;
+            let calBtnHTML = '';
+            if (addedCalendarItems.includes(itemId)) {
+                calBtnHTML = `<a href="${calLink}" target="_blank" class="action-btn calendar-added-btn">✅ Added</a>`;
+            } else {
+                calBtnHTML = `<a href="${calLink}" target="_blank" class="action-btn calendar-btn track-calendar-btn" data-id="${itemId}">📅 Calendar</a>`;
+            }
 
             const timeZoneBadge = item.timeZone ? ` <span style="font-size:0.85em; color:#888;">${item.timeZone}</span>` : '';
             const hrOffsetBadge = item.hrOffset ? ` <span style="color:#00838f; font-weight:bold; font-size:0.85em; background-color:#e0f7fa; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">⏱️ ${item.hrOffset}</span>` : '';
@@ -201,7 +199,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     categoryBtns.forEach(btn => { btn.addEventListener('click', (e) => { categoryBtns.forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentCategory = e.target.dataset.category; renderCards(); }); });
     timeBtns.forEach(btn => { btn.addEventListener('click', (e) => { timeBtns.forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentTime = e.target.dataset.time; renderCards(); }); });
-    container.addEventListener('click', (e) => { if (e.target.classList.contains('toggle-hide-btn')) { const itemId = e.target.getAttribute('data-id'); if (hiddenItems.includes(itemId)) hiddenItems = hiddenItems.filter(id => id !== itemId); else hiddenItems.push(itemId); localStorage.setItem('hiddenItineraryItems', JSON.stringify(hiddenItems)); renderCards(); renderCountdown(); } });
+    
+    // Updated click listener to handle both Hide and Calendar clicks
+    container.addEventListener('click', (e) => { 
+        // Hide Button Logic
+        if (e.target.classList.contains('toggle-hide-btn')) { 
+            const itemId = e.target.getAttribute('data-id'); 
+            if (hiddenItems.includes(itemId)) hiddenItems = hiddenItems.filter(id => id !== itemId); 
+            else hiddenItems.push(itemId); 
+            localStorage.setItem('hiddenItineraryItems', JSON.stringify(hiddenItems)); 
+            renderCards(); 
+            renderCountdown(); 
+        } 
+        
+        // NEW: Calendar Button Tracking Logic
+        const trackCalBtn = e.target.closest('.track-calendar-btn');
+        if (trackCalBtn) {
+            const itemId = trackCalBtn.getAttribute('data-id');
+            if (!addedCalendarItems.includes(itemId)) {
+                addedCalendarItems.push(itemId);
+                localStorage.setItem('addedCalendarItems', JSON.stringify(addedCalendarItems));
+                
+                // Instantly update the button visually without interrupting the link opening
+                trackCalBtn.classList.remove('calendar-btn', 'track-calendar-btn');
+                trackCalBtn.classList.add('calendar-added-btn');
+                trackCalBtn.innerHTML = '✅ Added';
+            }
+        }
+    });
 
     initApp();
 });
