@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
         excursion: '🍳'
     };
 
-    // NEW: Error handling if data.js is missing or misnamed
     if (typeof itineraryData === 'undefined') {
         container.innerHTML = '<p style="text-align:center; padding: 30px; color: #ffba08;">⚠️ Could not load data.js. Please check the file name and your index.html links.</p>';
         return;
@@ -28,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
         itineraryData.forEach((item) => {
             if (filterType !== 'all' && item.type !== filterType) return;
 
-            // NEW: Smarter change-tracking by reference number instead of list position
             let isChanged = false;
             if (cachedData.length > 0) {
                 const oldItem = cachedData.find(old => old.reference === item.reference);
@@ -48,28 +46,37 @@ document.addEventListener('DOMContentLoaded', () => {
             if (isPast) classNames.push('past');
             card.className = classNames.join(' ');
 
-           card.innerHTML = `
+            // Make the card clickable to toggle expansion
+            card.addEventListener('click', (e) => {
+                // Prevent toggling if clicking directly on a button link
+                if (e.target.closest('.action-btn')) return;
+                card.classList.toggle('expanded');
+            });
+
+            // New Accordion Structure
+            card.innerHTML = `
                 ${isChanged ? '<div class="changed-badge">UPDATED</div>' : ''}
-                <div class="route">
-                    <span>${item.startPoint}</span>
-                    <span>${typeIcons[item.type] || '📍'}</span>
-                    <span>${item.endPoint}</span>
-                </div>
-                <div class="details">
-                    <div class="datetime">
-                        <span class="date">${item.date}</span>
-                        <span class="time">${item.time}</span>
+                
+                <div class="card-summary">
+                    <div class="summary-icon">${typeIcons[item.type] || '📍'}</div>
+                    <div class="summary-route">
+                        <div class="route-text">${item.startPoint} ➔ ${item.endPoint}</div>
+                        <div class="route-date">${item.date} • ${item.time}</div>
                     </div>
-                    <div class="reference-group">
+                    <div class="expand-icon">▼</div>
+                </div>
+
+                <div class="card-details">
+                    <div class="details-header">
                         <div class="flight-number">${item.reference}</div>
                         ${item.pnr ? `<div class="pnr-badge">PNR: ${item.pnr}</div>` : ''}
                     </div>
-                </div>
-                <div class="airline">${item.title}</div>
-                
-                <div class="button-group">
-                    <a href="${item.link1Url}" target="_blank" class="action-btn primary-btn">${item.link1Text}</a>
-                    <a href="${item.link2Url}" target="_blank" class="action-btn secondary-btn">${item.link2Text}</a>
+                    <div class="airline">${item.title}</div>
+                    
+                    <div class="button-group">
+                        <a href="${item.link1Url}" target="_blank" class="action-btn primary-btn">${item.link1Text}</a>
+                        <a href="${item.link2Url}" target="_blank" class="action-btn secondary-btn">${item.link2Text}</a>
+                    </div>
                 </div>
             `;
 
@@ -88,4 +95,3 @@ document.addEventListener('DOMContentLoaded', () => {
     renderCards();
     localStorage.setItem(CACHE_KEY, JSON.stringify(itineraryData));
 });
-
