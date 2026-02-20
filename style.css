@@ -20,12 +20,20 @@ header {
     display: flex;
     overflow-x: auto;
     gap: 10px;
-    padding: 10px 0;
-    margin-top: 15px;
+    padding: 10px 0 5px 0;
+    margin-top: 5px;
     scrollbar-width: none; 
 }
 .filter-bar::-webkit-scrollbar {
     display: none;
+}
+
+/* Make the second time bar distinct */
+.time-bar {
+    padding: 5px 0 15px 0;
+    margin-top: 0;
+    border-bottom: 1px solid #1b263b;
+    margin-bottom: 15px;
 }
 
 .filter-btn {
@@ -45,6 +53,19 @@ header {
     background-color: #f77f00;
     color: #ffffff;
     border-color: #f77f00;
+}
+
+/* Softer styling for the Time buttons */
+.time-btn {
+    background-color: #0d1b2a;
+    border: 1px dashed #415a77;
+    font-size: 0.85em;
+}
+
+.time-btn.active {
+    background-color: #415a77;
+    color: #ffffff;
+    border: 1px solid #415a77;
 }
 
 /* --- NEW ACCORDION CARD STYLES --- */
@@ -197,3 +218,4 @@ header {
     border: 1px solid #dadce0;
     cursor: pointer;
 }
+
