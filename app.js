@@ -1,9 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('itinerary-container');
+    const countdownBanner = document.getElementById('countdown-banner');
     const categoryBtns = document.querySelectorAll('.category-btn');
     const timeBtns = document.querySelectorAll('.time-btn');
     
-    // Your live Google Sheet link
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQve_ZOhcMNg5ITqIvTuIHH_Pcy6pRRoyGw691MvqTVilIC7FzFHGxycf-svHjbItJBp--BTG37Xlui/pub?output=csv';
     
     let hiddenItems = JSON.parse(localStorage.getItem('hiddenItineraryItems')) || [];
@@ -11,13 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentTime = 'all';
     let itineraryData = []; 
 
-    const typeIcons = {
-        flight: '✈️',
-        train: '🚆',
-        car: '🚗',
-        hotel: '🏨',
-        excursion: '🍳'
-    };
+    const typeIcons = { flight: '✈️', train: '🚆', car: '🚗', hotel: '🏨', excursion: '🍳' };
 
     async function initApp() {
         try {
@@ -26,36 +20,29 @@ document.addEventListener('DOMContentLoaded', () => {
             
             itineraryData = parseCSV(csvText);
             itineraryData.sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
+            
             renderCards();
+            renderCountdown(); 
+            
+            // Keep the countdown ticking every 60 seconds!
+            setInterval(renderCountdown, 60000); 
         } catch (error) {
-            container.innerHTML = '<p style="text-align:center; padding: 30px; color: #ffba08;">⚠️ Could not load data from Google Sheets. Check your internet connection.</p>';
+            container.innerHTML = '<p style="text-align:center; padding: 30px; color: #ffba08;">⚠️ Could not load data from Google Sheets.</p>';
         }
     }
 
     function parseCSV(str) {
         const rows = [];
-        let row = [];
-        let curr = '';
-        let inQuotes = false;
+        let row = [], curr = '', inQuotes = false;
         
         for (let i = 0; i < str.length; i++) {
             const char = str[i];
-            if (char === '"') {
-                inQuotes = !inQuotes;
-            } else if (char === ',' && !inQuotes) {
-                row.push(curr.trim());
-                curr = '';
-            } else if (char === '\n' && !inQuotes) {
-                row.push(curr.trim());
-                rows.push(row);
-                row = [];
-                curr = '';
-            } else if (char !== '\r') {
-                curr += char;
-            }
+            if (char === '"') inQuotes = !inQuotes;
+            else if (char === ',' && !inQuotes) { row.push(curr.trim()); curr = ''; }
+            else if (char === '\n' && !inQuotes) { row.push(curr.trim()); rows.push(row); row = []; curr = ''; }
+            else if (char !== '\r') curr += char;
         }
-        row.push(curr.trim());
-        rows.push(row);
+        row.push(curr.trim()); rows.push(row);
         
         const cleanRows = rows.filter(r => r.join('').trim() !== '');
         const headers = cleanRows[0];
@@ -63,28 +50,74 @@ document.addEventListener('DOMContentLoaded', () => {
         
         for (let i = 1; i < cleanRows.length; i++) {
             let obj = {};
-            headers.forEach((header, index) => {
-                obj[header] = cleanRows[i][index] || '';
-            });
+            headers.forEach((header, index) => { obj[header] = cleanRows[i][index] || ''; });
             data.push(obj);
         }
         return data;
     }
 
+    // NEW: Calculate and build the Calendar URL
+    function generateCalendarLink(item) {
+        const itemDate = new Date(`${item.date} ${item.time}`);
+        
+        // Google Calendar needs dates formatted as YYYYMMDDTHHMMSS
+        const pad = (n) => n < 10 ? '0' + n : n;
+        const startStr = `${itemDate.getFullYear()}${pad(itemDate.getMonth()+1)}${pad(itemDate.getDate())}T${pad(itemDate.getHours())}${pad(itemDate.getMinutes())}00`;
+        
+        // Since we don't track end times, we default the calendar block to 2 hours long
+        const endDate = new Date(itemDate.getTime() + 2 * 60 * 60 * 1000);
+        const endStr = `${endDate.getFullYear()}${pad(endDate.getMonth()+1)}${pad(endDate.getDate())}T${pad(endDate.getHours())}${pad(endDate.getMinutes())}00`;
+
+        const title = encodeURIComponent(`${typeIcons[item.type] || ''} ${item.title} (${item.reference})`);
+        const details = encodeURIComponent(`Booking Ref/PNR: ${item.pnr || item.reference}\nRoute: ${item.startPoint} to ${item.endPoint}`);
+        const location = encodeURIComponent(item.startPoint);
+
+        return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${details}&location=${location}`;
+    }
+
+    // NEW: Dashboard Countdown Logic
+    function renderCountdown() {
+        const now = new Date();
+        
+        // Find the absolute next event in the timeline that isn't hidden
+        const nextEvent = itineraryData.find(item => {
+            const itemDate = new Date(`${item.date} ${item.time}`);
+            const itemId = item.reference + item.date;
+            return itemDate > now && !hiddenItems.includes(itemId);
+        });
+
+        if (!nextEvent) {
+            countdownBanner.style.display = 'none';
+            return;
+        }
+
+        countdownBanner.style.display = 'block';
+        const eventDate = new Date(`${nextEvent.date} ${nextEvent.time}`);
+        const diffMs = eventDate - now;
+        
+        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+        let countdownText = '';
+        if (days > 0) countdownText += `${days}d `;
+        if (hours > 0 || days > 0) countdownText += `${hours}h `;
+        countdownText += `${minutes}m`;
+
+        countdownBanner.innerHTML = `
+            <div class="countdown-title">Next Up: ${nextEvent.title}</div>
+            <div class="countdown-timer">⏳ ${countdownText}</div>
+        `;
+    }
+
     function renderCards() {
         container.innerHTML = ''; 
-
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
         const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-        
-        const tomorrowStart = new Date(todayStart);
-        tomorrowStart.setDate(tomorrowStart.getDate() + 1);
-        const tomorrowEnd = new Date(todayEnd);
-        tomorrowEnd.setDate(tomorrowEnd.getDate() + 1);
-        
-        const day3End = new Date(todayEnd);
-        day3End.setDate(day3End.getDate() + 3);
+        const tomorrowStart = new Date(todayStart); tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+        const tomorrowEnd = new Date(todayEnd); tomorrowEnd.setDate(tomorrowEnd.getDate() + 1);
+        const day3End = new Date(todayEnd); day3End.setDate(day3End.getDate() + 3);
 
         itineraryData.forEach((item) => {
             const itemDateTime = new Date(`${item.date} ${item.time}`);
@@ -101,13 +134,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (currentTime !== 'all') {
                 let timeMatch = false;
-                if (currentTime === 'day0') {
-                    timeMatch = (itemDateTime >= todayStart && itemDateTime <= todayEnd);
-                } else if (currentTime === 'day1') {
-                    timeMatch = (itemDateTime >= tomorrowStart && itemDateTime <= tomorrowEnd);
-                } else if (currentTime === 'day3') {
-                    timeMatch = (itemDateTime >= now && itemDateTime <= day3End);
-                }
+                if (currentTime === 'day0') timeMatch = (itemDateTime >= todayStart && itemDateTime <= todayEnd);
+                else if (currentTime === 'day1') timeMatch = (itemDateTime >= tomorrowStart && itemDateTime <= tomorrowEnd);
+                else if (currentTime === 'day3') timeMatch = (itemDateTime >= now && itemDateTime <= day3End);
                 if (!timeMatch) return;
             }
 
@@ -123,22 +152,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let hideBtnHTML = '';
             if (isPast) {
-                if (isHidden) {
-                    hideBtnHTML = `<button class="action-btn toggle-hide-btn" data-id="${itemId}">👁️ Unhide</button>`;
-                } else {
-                    hideBtnHTML = `<button class="action-btn toggle-hide-btn" data-id="${itemId}">👻 Hide</button>`;
-                }
+                hideBtnHTML = isHidden 
+                    ? `<button class="action-btn toggle-hide-btn" data-id="${itemId}">👁️ Unhide</button>` 
+                    : `<button class="action-btn toggle-hide-btn" data-id="${itemId}">👻 Hide</button>`;
             }
 
-            let weatherLocation = item.startPoint;
-            if (item.type === 'flight' || item.type === 'train') {
-                weatherLocation = item.endPoint; 
-            }
+            let weatherLocation = (item.type === 'flight' || item.type === 'train') ? item.endPoint : item.startPoint;
             let weatherBtnHTML = `<a href="https://www.google.com/search?q=current+weather+${encodeURIComponent(weatherLocation)}" target="_blank" class="action-btn weather-btn">⛅ Weather</a>`;
 
-            // Setup visual badges
+            // Setup new Calendar button
+            const calLink = generateCalendarLink(item);
+            const calBtnHTML = `<a href="${calLink}" target="_blank" class="action-btn calendar-btn">📅 Calendar</a>`;
+
             const timeZoneBadge = item.timeZone ? ` <span style="font-size:0.85em; color:#888;">${item.timeZone}</span>` : '';
-            // NEW: Hours offset badge
             const hrOffsetBadge = item.hrOffset ? ` <span style="color:#00838f; font-weight:bold; font-size:0.85em; background-color:#e0f7fa; padding: 2px 6px; border-radius: 4px; margin-left: 4px;">⏱️ ${item.hrOffset}</span>` : '';
             const nextDayBadge = item.dayOffset ? ` <span style="color:#f77f00; font-weight:bold; font-size:0.85em; margin-left: 4px;">${item.dayOffset} Day</span>` : '';
 
@@ -163,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <a href="${item.link1Url}" target="_blank" class="action-btn primary-btn">${item.link1Text}</a>
                         <a href="${item.link2Url}" target="_blank" class="action-btn secondary-btn">${item.link2Text}</a>
                         ${weatherBtnHTML}
+                        ${calBtnHTML}
                         ${hideBtnHTML}
                     </div>
                 </div>
@@ -172,36 +199,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    categoryBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            categoryBtns.forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-            currentCategory = e.target.dataset.category;
-            renderCards();
-        });
-    });
-
-    timeBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            timeBtns.forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-            currentTime = e.target.dataset.time;
-            renderCards();
-        });
-    });
-
-    container.addEventListener('click', (e) => {
-        if (e.target.classList.contains('toggle-hide-btn')) {
-            const itemId = e.target.getAttribute('data-id');
-            if (hiddenItems.includes(itemId)) {
-                hiddenItems = hiddenItems.filter(id => id !== itemId);
-            } else {
-                hiddenItems.push(itemId);
-            }
-            localStorage.setItem('hiddenItineraryItems', JSON.stringify(hiddenItems));
-            renderCards();
-        }
-    });
+    categoryBtns.forEach(btn => { btn.addEventListener('click', (e) => { categoryBtns.forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentCategory = e.target.dataset.category; renderCards(); }); });
+    timeBtns.forEach(btn => { btn.addEventListener('click', (e) => { timeBtns.forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentTime = e.target.dataset.time; renderCards(); }); });
+    container.addEventListener('click', (e) => { if (e.target.classList.contains('toggle-hide-btn')) { const itemId = e.target.getAttribute('data-id'); if (hiddenItems.includes(itemId)) hiddenItems = hiddenItems.filter(id => id !== itemId); else hiddenItems.push(itemId); localStorage.setItem('hiddenItineraryItems', JSON.stringify(hiddenItems)); renderCards(); renderCountdown(); } });
 
     initApp();
 });
