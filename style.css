@@ -252,3 +252,9 @@ header {
     border: 1px solid #ce93d8;
 }
 
+/* Calendar Added Button Style */
+.calendar-added-btn {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}
