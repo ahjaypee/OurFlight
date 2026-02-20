@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('itinerary-container');
     const filterBtns = document.querySelectorAll('.filter-btn');
-    const CACHE_KEY = 'cachedItineraryData';
     
     const typeIcons = {
         flight: '✈️',
@@ -19,21 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sort chronologically
     itineraryData.sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
 
-    let cachedData = JSON.parse(localStorage.getItem(CACHE_KEY)) || [];
-
     function renderCards(filterType = 'all') {
         container.innerHTML = ''; 
 
         itineraryData.forEach((item) => {
             if (filterType !== 'all' && item.type !== filterType) return;
-
-            let isChanged = false;
-            if (cachedData.length > 0) {
-                const oldItem = cachedData.find(old => old.reference === item.reference);
-                if (oldItem && (oldItem.time !== item.time || oldItem.date !== item.date)) {
-                    isChanged = true;
-                }
-            }
 
             const itemDateTime = new Date(`${item.date} ${item.time}`);
             const now = new Date();
@@ -42,21 +31,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const card = document.createElement('div');
             
             let classNames = ['flight-card'];
-            if (isChanged) classNames.push('changed');
             if (isPast) classNames.push('past');
             card.className = classNames.join(' ');
 
             // Make the card clickable to toggle expansion
             card.addEventListener('click', (e) => {
-                // Prevent toggling if clicking directly on a button link
                 if (e.target.closest('.action-btn')) return;
                 card.classList.toggle('expanded');
             });
 
-            // New Accordion Structure
             card.innerHTML = `
-                ${isChanged ? '<div class="changed-badge">UPDATED</div>' : ''}
-                
                 <div class="card-summary">
                     <div class="summary-icon">${typeIcons[item.type] || '📍'}</div>
                     <div class="summary-route">
@@ -93,5 +77,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     renderCards();
-    localStorage.setItem(CACHE_KEY, JSON.stringify(itineraryData));
 });
