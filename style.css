@@ -224,10 +224,10 @@ header {
     color: white;
     padding: 15px;
     border-radius: 12px;
-    margin: 5px 15px 15px 15px;
+    margin: 15px 15px 10px 15px; /* Adjusted to look like a proper header */
     text-align: center;
     box-shadow: 0 4px 6px rgba(0,0,0,0.2);
-    display: none; /* Hidden until Javascript finds an upcoming event */
+    display: none; 
 }
 
 .countdown-title {
@@ -258,3 +258,4 @@ header {
     color: #2e7d32;
     border: 1px solid #a5d6a7;
 }
+
