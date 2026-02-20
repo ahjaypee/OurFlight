@@ -89,10 +89,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            let weatherBtnHTML = '';
-            if (item.type === 'hotel') {
-                weatherBtnHTML = `<a href="https://www.google.com/search?q=current+weather+${encodeURIComponent(item.startPoint)}" target="_blank" class="action-btn weather-btn">⛅ Weather</a>`;
+            // NEW: Smart Weather Location Logic
+            // Use destination for travel, but current city for hotels, cars, and excursions
+            let weatherLocation = item.startPoint;
+            if (item.type === 'flight' || item.type === 'train') {
+                weatherLocation = item.endPoint; 
             }
+            
+            // Universal Weather Button
+            let weatherBtnHTML = `<a href="https://www.google.com/search?q=current+weather+${encodeURIComponent(weatherLocation)}" target="_blank" class="action-btn weather-btn">⛅ Weather</a>`;
 
             card.innerHTML = `
                 <div class="card-summary">
