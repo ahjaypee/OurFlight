@@ -190,3 +190,10 @@ header {
     opacity: 0.8;
 }
 
+/* Hide/Unhide Button Style */
+.toggle-hide-btn {
+    background-color: #f1f3f4;
+    color: #5f6368;
+    border: 1px solid #dadce0;
+    cursor: pointer;
+}
