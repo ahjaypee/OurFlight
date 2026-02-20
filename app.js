@@ -45,6 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
         row.push(curr.trim()); rows.push(row);
         
         const cleanRows = rows.filter(r => r.join('').trim() !== '');
+        if (cleanRows.length < 2) return []; // Safety check for empty sheets
+        
         const headers = cleanRows[0];
         const data = [];
         
@@ -71,6 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderCountdown() {
+        if (itineraryData.length === 0) {
+            countdownBanner.style.display = 'none';
+            return;
+        }
+
         const now = new Date();
         const nextEvent = itineraryData.find(item => {
             const itemDate = new Date(`${item.date} ${item.time}`);
@@ -104,6 +111,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderCards() {
         container.innerHTML = ''; 
+
+        // NEW: Tell the user if the spreadsheet is empty!
+        if (itineraryData.length === 0) {
+            container.innerHTML = '<p style="text-align:center; padding: 30px; color: #888;">⚠️ No trips found. Is your Google Sheet populated and published?</p>';
+            return;
+        }
+
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
         const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
@@ -160,17 +174,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 calBtnHTML = `<a href="${calLink}" target="_blank" class="action-btn calendar-btn track-calendar-btn" data-id="${itemId}">📅 Calendar</a>`;
             }
 
-            // NEW: Modern Dashboard Colors for the timezone offsets
             let hrOffsetBadge = '';
             if (item.hrOffset) {
-                let badgeBg = '#e2e8f0'; // Default muted gray fallback
+                let badgeBg = '#e2e8f0'; 
                 let badgeText = '#475569';
                 
                 if (item.hrOffset.includes('+')) {
-                    badgeBg = '#dbeafe'; // Soft cool blue
+                    badgeBg = '#dbeafe'; 
                     badgeText = '#1e40af';
                 } else if (item.hrOffset.includes('-')) {
-                    badgeBg = '#f3e8ff'; // Soft muted mauve/purple
+                    badgeBg = '#f3e8ff'; 
                     badgeText = '#6b21a8';
                 }
                 
@@ -193,4 +206,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="card-details">
                     <div class="details-header" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                         <div class="flight-number">${item.reference}</div>
-                        ${item.pnr ? `<div class="pnr-badge">PNR: ${item.pnr}</div>` : ''
+                        ${item.pnr ? `<div class="pnr-badge">PNR: ${item.pnr}</div>` : ''}
+                        ${hideBtnHTML}
+                    </div>
+                    <div class="airline">${item.title}</div>
+                    
+                    <div class="button-group">
+                        <a href="${item.link1Url}" target="_blank" class="action-btn primary-btn">${item.link1Text}</a>
+                        <a href="${item.link2Url}" target="_blank" class="action-btn secondary-btn">${item.link2Text}</a>
+                        ${weatherBtnHTML}
+                        ${calBtnHTML}
+                    </div>
+                </div>
+            `;
+
+            container.appendChild(card);
+        });
+    }
+
+    categoryBtns.forEach(btn => { btn.addEventListener('click', (e) => { categoryBtns.forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentCategory = e.target.dataset.category; renderCards(); }); });
+    timeBtns.forEach(btn => { btn.addEventListener('click', (e) => { timeBtns.forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentTime = e.target.dataset.time; renderCards(); }); });
+    
+    container.addEventListener('click', (e) => { 
+        if (e.target.classList.contains('toggle-hide-btn')) { 
+            const itemId = e.target.getAttribute('data-id'); 
+            if (hiddenItems.includes(itemId)) hiddenItems = hiddenItems.filter(id => id !== itemId); 
+            else hiddenItems.push(itemId); 
+            localStorage.setItem('hiddenItineraryItems', JSON.stringify(hiddenItems)); 
+            renderCards(); 
+            renderCountdown(); 
+        } 
+        
+        const trackCalBtn = e.target.closest('.track-calendar-btn');
+        if (trackCalBtn) {
+            const itemId = trackCalBtn.getAttribute('data-id');
+            if (!addedCalendarItems.includes(itemId)) {
+                addedCalendarItems.push(itemId);
+                localStorage.setItem('addedCalendarItems', JSON.stringify(addedCalendarItems));
+                
+                trackCalBtn.classList.remove('calendar-btn', 'track-calendar-btn');
+                trackCalBtn.classList.add('calendar-added-btn');
+                trackCalBtn.innerHTML = '✅ Added';
+            }
+        }
+    });
+
+    initApp();
+});
