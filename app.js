@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('itinerary-container');
     const countdownBanner = document.getElementById('countdown-banner');
-    const tripContainer = document.getElementById('trip-filter-container'); // NEW
+    const tripContainer = document.getElementById('trip-filter-container');
     const categoryBtns = document.querySelectorAll('.category-btn');
     const timeBtns = document.querySelectorAll('.time-btn');
     
@@ -19,19 +19,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function initApp() {
         try {
+            setupTimeButtons(); // NEW: Write the live dates onto the buttons
+            
             const response = await fetch(sheetUrl);
             const csvText = await response.text();
             
             itineraryData = parseCSV(csvText);
             itineraryData.sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
             
-            buildTripFilters(); // NEW: Build buttons before drawing cards
+            buildTripFilters(); 
             renderCards();
             renderCountdown(); 
             setInterval(renderCountdown, 60000); 
         } catch (error) {
             container.innerHTML = '<p style="text-align:center; padding: 30px; color: #ffba08;">⚠️ Could not load data from Google Sheets.</p>';
         }
+    }
+
+    // NEW: Calculate and inject live dates onto the buttons
+    function setupTimeButtons() {
+        const now = new Date();
+        const formatDate = (date) => date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+        const today = new Date(now);
+        const tomorrow = new Date(now); tomorrow.setDate(tomorrow.getDate() + 1);
+        const dayAfter = new Date(now); dayAfter.setDate(dayAfter.getDate() + 2);
+
+        document.querySelector('.time-btn[data-time="today"]').textContent = `Today (${formatDate(today)})`;
+        document.querySelector('.time-btn[data-time="tomorrow"]').textContent = `Tomorrow (${formatDate(tomorrow)})`;
+        document.querySelector('.time-btn[data-time="dayafter"]').textContent = `Day After (${formatDate(dayAfter)})`;
     }
 
     function parseCSV(str) {
@@ -61,32 +77,25 @@ document.addEventListener('DOMContentLoaded', () => {
         return data;
     }
 
-    // NEW: Function to dynamically generate trip buttons
     function buildTripFilters() {
-        // 1. Get an array of all unique trip names (ignoring empty fields)
         const uniqueTrips = [...new Set(itineraryData.map(item => item.trip).filter(trip => trip && trip.trim() !== ''))];
         
-        // If there are no named trips in the spreadsheet, hide the bar completely
         if (uniqueTrips.length === 0) {
             tripContainer.style.display = 'none';
             return;
         }
 
-        // Show the bar and clear anything inside it
         tripContainer.style.display = 'flex';
         tripContainer.innerHTML = '';
 
-        // 2. Loop through the unique names and create buttons
         uniqueTrips.forEach(trip => {
             const btn = document.createElement('button');
             btn.className = 'filter-btn trip-btn';
             btn.setAttribute('data-trip', trip);
             btn.textContent = trip;
             
-            // 3. Attach the click logic directly to this new button
             btn.addEventListener('click', (e) => {
                 const clickedTrip = e.target.dataset.trip;
-                
                 if (currentTrip === clickedTrip) {
                     e.target.classList.remove('active');
                     currentTrip = 'all';
@@ -95,12 +104,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     e.target.classList.add('active'); 
                     currentTrip = clickedTrip; 
                 }
-                
                 renderCards(); 
                 renderCountdown(); 
             });
 
-            // 4. Drop it onto the screen
             tripContainer.appendChild(btn);
         });
     }
@@ -169,9 +176,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
         const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+        
         const tomorrowStart = new Date(todayStart); tomorrowStart.setDate(tomorrowStart.getDate() + 1);
         const tomorrowEnd = new Date(todayEnd); tomorrowEnd.setDate(tomorrowEnd.getDate() + 1);
-        const day3End = new Date(todayEnd); day3End.setDate(day3End.getDate() + 3);
+        
+        const dayAfterStart = new Date(todayStart); dayAfterStart.setDate(dayAfterStart.getDate() + 2);
+        const dayAfterEnd = new Date(todayEnd); dayAfterEnd.setDate(dayAfterEnd.getDate() + 2);
 
         itineraryData.forEach((item) => {
             const itemDateTime = new Date(`${item.date} ${item.time}`);
@@ -179,9 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const isHidden = hiddenItems.includes(itemId);
             const isPast = itemDateTime < now;
 
-            if (currentTrip !== 'all' && item.trip !== currentTrip) {
-                return;
-            }
+            if (currentTrip !== 'all' && item.trip !== currentTrip) return;
 
             if (currentCategory === 'hidden') {
                 if (!isHidden) return; 
@@ -190,11 +198,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (currentCategory !== 'all' && item.type !== currentCategory) return; 
             }
 
+            // UPDATED: Exact date matching for the new buttons
             if (currentTime !== 'all') {
                 let timeMatch = false;
-                if (currentTime === 'day0') timeMatch = (itemDateTime >= todayStart && itemDateTime <= todayEnd);
-                else if (currentTime === 'day1') timeMatch = (itemDateTime >= tomorrowStart && itemDateTime <= tomorrowEnd);
-                else if (currentTime === 'day3') timeMatch = (itemDateTime >= now && itemDateTime <= day3End);
+                if (currentTime === 'today') timeMatch = (itemDateTime >= todayStart && itemDateTime <= todayEnd);
+                else if (currentTime === 'tomorrow') timeMatch = (itemDateTime >= tomorrowStart && itemDateTime <= tomorrowEnd);
+                else if (currentTime === 'dayafter') timeMatch = (itemDateTime >= dayAfterStart && itemDateTime <= dayAfterEnd);
                 if (!timeMatch) return;
             }
 
@@ -276,8 +285,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    categoryBtns.forEach(btn => { btn.addEventListener('click', (e) => { categoryBtns.forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentCategory = e.target.dataset.category; renderCards(); }); });
-    timeBtns.forEach(btn => { btn.addEventListener('click', (e) => { timeBtns.forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentTime = e.target.dataset.time; renderCards(); }); });
+    categoryBtns.forEach(btn => { 
+        btn.addEventListener('click', (e) => { 
+            const clickedCategory = e.target.dataset.category;
+            if (currentCategory === clickedCategory) {
+                e.target.classList.remove('active');
+                currentCategory = 'all';
+            } else {
+                categoryBtns.forEach(b => b.classList.remove('active')); 
+                e.target.classList.add('active'); 
+                currentCategory = clickedCategory; 
+            }
+            renderCards(); 
+        }); 
+    });
+
+    timeBtns.forEach(btn => { 
+        btn.addEventListener('click', (e) => { 
+            const clickedTime = e.target.dataset.time;
+            if (currentTime === clickedTime) {
+                e.target.classList.remove('active');
+                currentTime = 'all';
+            } else {
+                timeBtns.forEach(b => b.classList.remove('active')); 
+                e.target.classList.add('active'); 
+                currentTime = clickedTime; 
+            }
+            renderCards(); 
+        }); 
+    });
     
     container.addEventListener('click', (e) => { 
         if (e.target.classList.contains('toggle-hide-btn')) { 
