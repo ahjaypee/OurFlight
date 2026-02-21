@@ -245,18 +245,11 @@ header {
     color: #f77f00;
 }
 
-/* Calendar Button Style */
-.calendar-btn {
-    background-color: #f3e5f5;
-    color: #6a1b9a;
-    border: 1px solid #ce93d8;
-}
-
-/* Calendar Added Button Style */
-.calendar-added-btn {
-    background-color: #e8f5e9;
-    color: #2e7d32;
-    border: 1px solid #a5d6a7;
+/* Weather Button Style - Soft Mauve */
+.weather-btn {
+    background-color: #f3e8ff; 
+    color: #6b21a8;            
+    border: 1px solid #e9d5ff;
 }
 /* Mini Hide Button for the Header Row */
 .small-hide-btn {
@@ -308,3 +301,4 @@ header {
     color: #1e7e34;            /* Deeper green for crisp text readability */
     border: 1px solid #c3e6cb;
 }
+
