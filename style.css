@@ -271,3 +271,28 @@ header {
     margin-left: auto; /* This pushes it perfectly to the far right side */
 }
 
+/* Trip Filter Bar Distinct Styling */
+.trip-bar {
+    background-color: #e2e8f0;
+    padding: 8px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+.trip-btn {
+    font-weight: bold;
+    color: #334155;
+}
+.trip-btn.active {
+    background-color: #3b82f6;
+    color: white;
+}
+
+/* Square Icon Buttons */
+.icon-btn {
+    padding: 6px 12px;
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+}
