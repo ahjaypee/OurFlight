@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function initApp() {
         try {
-            setupTimeButtons(); // NEW: Write the live dates onto the buttons
+            setupTimeButtons(); // Calculate dynamic dates before data loads
             
             const response = await fetch(sheetUrl);
             const csvText = await response.text();
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // NEW: Calculate and inject live dates onto the buttons
+    // Dynamic Date Generator for the Time Chips
     function setupTimeButtons() {
         const now = new Date();
         const formatDate = (date) => date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -94,16 +94,19 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.setAttribute('data-trip', trip);
             btn.textContent = trip;
             
-            btn.addEventListener('click', (e) => {
-                const clickedTrip = e.target.dataset.trip;
+            // Bulletproof Click Logic locking to the Button itself
+            btn.addEventListener('click', () => {
+                const clickedTrip = btn.getAttribute('data-trip');
+                
                 if (currentTrip === clickedTrip) {
-                    e.target.classList.remove('active');
+                    btn.classList.remove('active');
                     currentTrip = 'all';
                 } else {
                     document.querySelectorAll('.trip-btn').forEach(b => b.classList.remove('active')); 
-                    e.target.classList.add('active'); 
+                    btn.classList.add('active'); 
                     currentTrip = clickedTrip; 
                 }
+                
                 renderCards(); 
                 renderCountdown(); 
             });
@@ -198,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (currentCategory !== 'all' && item.type !== currentCategory) return; 
             }
 
-            // UPDATED: Exact date matching for the new buttons
+            // Time Filter Matcher
             if (currentTime !== 'all') {
                 let timeMatch = false;
                 if (currentTime === 'today') timeMatch = (itemDateTime >= todayStart && itemDateTime <= todayEnd);
@@ -285,30 +288,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Bulletproof click logic for Categories
     categoryBtns.forEach(btn => { 
-        btn.addEventListener('click', (e) => { 
-            const clickedCategory = e.target.dataset.category;
+        btn.addEventListener('click', () => { 
+            const clickedCategory = btn.getAttribute('data-category');
+            
             if (currentCategory === clickedCategory) {
-                e.target.classList.remove('active');
+                btn.classList.remove('active');
                 currentCategory = 'all';
             } else {
                 categoryBtns.forEach(b => b.classList.remove('active')); 
-                e.target.classList.add('active'); 
+                btn.classList.add('active'); 
                 currentCategory = clickedCategory; 
             }
             renderCards(); 
         }); 
     });
 
+    // Bulletproof click logic for Time
     timeBtns.forEach(btn => { 
-        btn.addEventListener('click', (e) => { 
-            const clickedTime = e.target.dataset.time;
+        btn.addEventListener('click', () => { 
+            const clickedTime = btn.getAttribute('data-time');
+            
             if (currentTime === clickedTime) {
-                e.target.classList.remove('active');
+                btn.classList.remove('active');
                 currentTime = 'all';
             } else {
                 timeBtns.forEach(b => b.classList.remove('active')); 
-                e.target.classList.add('active'); 
+                btn.classList.add('active'); 
                 currentTime = clickedTime; 
             }
             renderCards(); 
