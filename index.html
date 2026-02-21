@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Travel Itinerary</title>
-    <link rel="stylesheet" href="style.css?v=19">
+    <link rel="stylesheet" href="style.css?v=21">
 </head>
 <body>
     <header>
@@ -14,7 +14,6 @@
             </div>
 
         <div class="filter-bar">
-            <button class="filter-btn category-btn active" data-category="all">All</button>
             <button class="filter-btn category-btn" data-category="flight">Flights</button>
             <button class="filter-btn category-btn" data-category="train">Trains</button>
             <button class="filter-btn category-btn" data-category="car">Cars</button>
@@ -24,16 +23,15 @@
         </div>
 
         <div class="filter-bar time-bar">
-            <button class="filter-btn time-btn active" data-time="all">Any Time</button>
-            <button class="filter-btn time-btn" data-time="day0">Day 0</button>
-            <button class="filter-btn time-btn" data-time="day1">Day+1</button>
-            <button class="filter-btn time-btn" data-time="day3">Day+3</button>
+            <button class="filter-btn time-btn" data-time="today">Today</button>
+            <button class="filter-btn time-btn" data-time="tomorrow">Tomorrow</button>
+            <button class="filter-btn time-btn" data-time="dayafter">Day After</button>
         </div>
     </header>
     
     <main id="itinerary-container">
         </main>
 
-    <script src="app.js?v=19"></script>
+    <script src="app.js?v=21"></script>
 </body>
 </html>
