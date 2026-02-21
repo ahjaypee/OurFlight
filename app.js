@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const sheetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQve_ZOhcMNg5ITqIvTuIHH_Pcy6pRRoyGw691MvqTVilIC7FzFHGxycf-svHjbItJBp--BTG37Xlui/pub?output=csv';
     
     let hiddenItems = JSON.parse(localStorage.getItem('hiddenItineraryItems')) || [];
-    let addedCalendarItems = JSON.parse(localStorage.getItem('addedCalendarItems')) || [];
     
     let currentTrip = 'all';
     let currentCategory = 'all';
@@ -113,21 +112,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function generateCalendarLink(item) {
-        const itemDate = new Date(`${item.date} ${item.time}`);
-        const pad = (n) => n < 10 ? '0' + n : n;
-        const startStr = `${itemDate.getFullYear()}${pad(itemDate.getMonth()+1)}${pad(itemDate.getDate())}T${pad(itemDate.getHours())}${pad(itemDate.getMinutes())}00`;
-        const endDate = new Date(itemDate.getTime() + 2 * 60 * 60 * 1000);
-        const endStr = `${endDate.getFullYear()}${pad(endDate.getMonth()+1)}${pad(endDate.getDate())}T${pad(endDate.getHours())}${pad(endDate.getMinutes())}00`;
-
-        const title = encodeURIComponent(`${typeIcons[item.type] || ''} ${item.title} (${item.reference})`);
-        const details = encodeURIComponent(`Booking Ref/PNR: ${item.pnr || item.reference}\nRoute: ${item.startPoint} to ${item.endPoint}`);
-        const location = encodeURIComponent(item.startPoint);
-
-        return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${details}&location=${location}`;
-    }
-
-    // NEW: Centralized Filtering Engine
     function getVisibleItems() {
         const now = new Date();
         const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
@@ -169,7 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Pull ONLY the items currently on the screen
         const visibleItems = getVisibleItems();
 
         if (visibleItems.length === 0) {
@@ -219,7 +202,6 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Pull ONLY the items currently on the screen
         const visibleItems = getVisibleItems();
 
         if (visibleItems.length === 0) {
@@ -254,14 +236,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let weatherLocation = (item.type === 'flight' || item.type === 'train') ? item.endPoint : item.startPoint;
             let weatherBtnHTML = `<a href="https://www.google.com/search?q=current+weather+${encodeURIComponent(weatherLocation)}" target="_blank" class="action-btn weather-btn">Weather</a>`;
-
-            const calLink = generateCalendarLink(item);
-            let calBtnHTML = '';
-            if (addedCalendarItems.includes(itemId)) {
-                calBtnHTML = `<a href="${calLink}" target="_blank" class="action-btn calendar-added-btn">Added</a>`;
-            } else {
-                calBtnHTML = `<a href="${calLink}" target="_blank" class="action-btn calendar-btn track-calendar-btn" data-id="${itemId}">Calendar</a>`;
-            }
 
             let hrOffsetBadge = '';
             if (item.hrOffset) {
@@ -301,10 +275,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="airline">${item.title}</div>
                     
                     <div class="button-group">
-                        <a href="${item.link1Url}" target="_blank" class="action-btn primary-btn">${item.link1Text}</a>
-                        <a href="${item.link2Url}" target="_blank" class="action-btn secondary-btn">${item.link2Text}</a>
+                        ${item.link1Url ? `<a href="${item.link1Url}" target="_blank" class="action-btn primary-btn">${item.link1Text}</a>` : ''}
+                        ${item.link2Url ? `<a href="${item.link2Url}" target="_blank" class="action-btn secondary-btn">${item.link2Text}</a>` : ''}
                         ${weatherBtnHTML}
-                        ${calBtnHTML}
                     </div>
                 </div>
             `;
@@ -325,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentCategory = clickedCategory; 
             }
             renderCards(); 
-            renderCountdown(); // Ensure the countdown updates instantly!
+            renderCountdown(); 
         }); 
     });
 
@@ -341,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentTime = clickedTime; 
             }
             renderCards(); 
-            renderCountdown(); // Ensure the countdown updates instantly!
+            renderCountdown(); 
         }); 
     });
     
@@ -354,19 +327,6 @@ document.addEventListener('DOMContentLoaded', () => {
             renderCards(); 
             renderCountdown(); 
         } 
-        
-        const trackCalBtn = e.target.closest('.track-calendar-btn');
-        if (trackCalBtn) {
-            const itemId = trackCalBtn.getAttribute('data-id');
-            if (!addedCalendarItems.includes(itemId)) {
-                addedCalendarItems.push(itemId);
-                localStorage.setItem('addedCalendarItems', JSON.stringify(addedCalendarItems));
-                
-                trackCalBtn.classList.remove('calendar-btn', 'track-calendar-btn');
-                trackCalBtn.classList.add('calendar-added-btn');
-                trackCalBtn.innerHTML = 'Added';
-            }
-        }
     });
 
     initApp();
