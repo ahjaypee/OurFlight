@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('itinerary-container');
     const countdownBanner = document.getElementById('countdown-banner');
-    // NEW: Grab the trip buttons
     const tripBtns = document.querySelectorAll('.trip-btn');
     const categoryBtns = document.querySelectorAll('.category-btn');
     const timeBtns = document.querySelectorAll('.time-btn');
@@ -11,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let hiddenItems = JSON.parse(localStorage.getItem('hiddenItineraryItems')) || [];
     let addedCalendarItems = JSON.parse(localStorage.getItem('addedCalendarItems')) || [];
     
-    // NEW: Track the current trip state
     let currentTrip = 'all';
     let currentCategory = 'all';
     let currentTime = 'all';
@@ -86,8 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const nextEvent = itineraryData.find(item => {
             const itemDate = new Date(`${item.date} ${item.time}`);
             const itemId = item.reference + item.date;
-            
-            // The countdown should respect the active trip filter!
             const tripMatch = currentTrip === 'all' || item.trip === currentTrip;
             
             return itemDate > now && !hiddenItems.includes(itemId) && tripMatch;
@@ -138,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const isHidden = hiddenItems.includes(itemId);
             const isPast = itemDateTime < now;
 
-            // NEW: Check Trip Filter
             if (currentTrip !== 'all' && item.trip !== currentTrip) {
                 return;
             }
@@ -168,23 +163,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.classList.toggle('expanded');
             });
 
+            // Clean text Hide button
             let hideBtnHTML = '';
             if (isPast) {
                 hideBtnHTML = isHidden 
-                    ? `<button class="small-hide-btn toggle-hide-btn" data-id="${itemId}">👁️ Unhide</button>` 
-                    : `<button class="small-hide-btn toggle-hide-btn" data-id="${itemId}">👻 Hide</button>`;
+                    ? `<button class="small-hide-btn toggle-hide-btn" data-id="${itemId}">Unhide</button>` 
+                    : `<button class="small-hide-btn toggle-hide-btn" data-id="${itemId}">Hide</button>`;
             }
 
-            // UPDATED: Sleek Icon Buttons
+            // Clean text Weather and Calendar buttons
             let weatherLocation = (item.type === 'flight' || item.type === 'train') ? item.endPoint : item.startPoint;
-            let weatherBtnHTML = `<a href="https://www.google.com/search?q=current+weather+${encodeURIComponent(weatherLocation)}" target="_blank" class="action-btn icon-btn" title="Weather">⛅</a>`;
+            let weatherBtnHTML = `<a href="https://www.google.com/search?q=current+weather+${encodeURIComponent(weatherLocation)}" target="_blank" class="action-btn weather-btn">Weather</a>`;
 
             const calLink = generateCalendarLink(item);
             let calBtnHTML = '';
             if (addedCalendarItems.includes(itemId)) {
-                calBtnHTML = `<a href="${calLink}" target="_blank" class="action-btn icon-btn calendar-added-btn" title="Added to Calendar">✅</a>`;
+                calBtnHTML = `<a href="${calLink}" target="_blank" class="action-btn calendar-added-btn">Added</a>`;
             } else {
-                calBtnHTML = `<a href="${calLink}" target="_blank" class="action-btn icon-btn track-calendar-btn" data-id="${itemId}" title="Add to Calendar">📅</a>`;
+                calBtnHTML = `<a href="${calLink}" target="_blank" class="action-btn calendar-btn track-calendar-btn" data-id="${itemId}">Calendar</a>`;
             }
 
             let hrOffsetBadge = '';
@@ -237,14 +233,24 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // NEW: Listeners for the Trip Tabs
+    // UPDATED: Trip Tabs Toggle Logic
     tripBtns.forEach(btn => { 
         btn.addEventListener('click', (e) => { 
-            tripBtns.forEach(b => b.classList.remove('active')); 
-            e.target.classList.add('active'); 
-            currentTrip = e.target.dataset.trip; 
+            const clickedTrip = e.target.dataset.trip;
+            
+            // If the user clicks the currently active trip, toggle it off (return to 'all')
+            if (currentTrip === clickedTrip) {
+                e.target.classList.remove('active');
+                currentTrip = 'all';
+            } else {
+                // Otherwise, turn off any active ones and turn this one on
+                tripBtns.forEach(b => b.classList.remove('active')); 
+                e.target.classList.add('active'); 
+                currentTrip = clickedTrip; 
+            }
+            
             renderCards(); 
-            renderCountdown(); // Update the countdown to show the next event for THIS trip!
+            renderCountdown(); 
         }); 
     });
 
@@ -270,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 trackCalBtn.classList.remove('calendar-btn', 'track-calendar-btn');
                 trackCalBtn.classList.add('calendar-added-btn');
-                trackCalBtn.innerHTML = '✅';
+                trackCalBtn.innerHTML = 'Added'; // Clean text here too!
             }
         }
     });
