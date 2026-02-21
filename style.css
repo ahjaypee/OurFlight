@@ -301,3 +301,10 @@ header {
     border-color: #3b82f6;
     box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
 }
+
+/* Weather Button Style */
+.weather-btn {
+    background-color: #e6f4ea; /* Soft pastel green */
+    color: #1e7e34;            /* Deeper green for crisp text readability */
+    border: 1px solid #c3e6cb;
+}
