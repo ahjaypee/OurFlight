@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function initApp() {
         try {
-            setupTimeButtons(); // Calculate dynamic dates before data loads
+            setupTimeButtons(); 
             
             const response = await fetch(sheetUrl);
             const csvText = await response.text();
@@ -36,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Dynamic Date Generator for the Time Chips
     function setupTimeButtons() {
         const now = new Date();
         const formatDate = (date) => date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -94,7 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.setAttribute('data-trip', trip);
             btn.textContent = trip;
             
-            // Bulletproof Click Logic locking to the Button itself
             btn.addEventListener('click', () => {
                 const clickedTrip = btn.getAttribute('data-trip');
                 
@@ -129,27 +127,72 @@ document.addEventListener('DOMContentLoaded', () => {
         return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startStr}/${endStr}&details=${details}&location=${location}`;
     }
 
+    // NEW: Centralized Filtering Engine
+    function getVisibleItems() {
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+        const tomorrowStart = new Date(todayStart); tomorrowStart.setDate(tomorrowStart.getDate() + 1);
+        const tomorrowEnd = new Date(todayEnd); tomorrowEnd.setDate(tomorrowEnd.getDate() + 1);
+        const dayAfterStart = new Date(todayStart); dayAfterStart.setDate(dayAfterStart.getDate() + 2);
+        const dayAfterEnd = new Date(todayEnd); dayAfterEnd.setDate(dayAfterEnd.getDate() + 2);
+
+        return itineraryData.filter((item) => {
+            const itemDateTime = new Date(`${item.date} ${item.time}`);
+            const itemId = item.reference + item.date;
+            const isHidden = hiddenItems.includes(itemId);
+
+            if (currentTrip !== 'all' && item.trip !== currentTrip) return false;
+
+            if (currentCategory === 'hidden') {
+                if (!isHidden) return false; 
+            } else {
+                if (isHidden) return false; 
+                if (currentCategory !== 'all' && item.type !== currentCategory) return false; 
+            }
+
+            if (currentTime !== 'all') {
+                let timeMatch = false;
+                if (currentTime === 'today') timeMatch = (itemDateTime >= todayStart && itemDateTime <= todayEnd);
+                else if (currentTime === 'tomorrow') timeMatch = (itemDateTime >= tomorrowStart && itemDateTime <= tomorrowEnd);
+                else if (currentTime === 'dayafter') timeMatch = (itemDateTime >= dayAfterStart && itemDateTime <= dayAfterEnd);
+                if (!timeMatch) return false;
+            }
+
+            return true;
+        });
+    }
+
     function renderCountdown() {
         if (itineraryData.length === 0) {
             countdownBanner.style.display = 'none';
             return;
         }
 
-        const now = new Date();
-        const nextEvent = itineraryData.find(item => {
-            const itemDate = new Date(`${item.date} ${item.time}`);
-            const itemId = item.reference + item.date;
-            const tripMatch = currentTrip === 'all' || item.trip === currentTrip;
-            
-            return itemDate > now && !hiddenItems.includes(itemId) && tripMatch;
-        });
+        // Pull ONLY the items currently on the screen
+        const visibleItems = getVisibleItems();
 
-        if (!nextEvent) {
+        if (visibleItems.length === 0) {
             countdownBanner.style.display = 'none';
             return;
         }
 
         countdownBanner.style.display = 'block';
+
+        const now = new Date();
+        const nextEvent = visibleItems.find(item => {
+            const itemDate = new Date(`${item.date} ${item.time}`);
+            return itemDate > now;
+        });
+
+        if (!nextEvent) {
+            countdownBanner.innerHTML = `
+                <div class="countdown-title">View Status</div>
+                <div class="countdown-timer">🏁 Past Events</div>
+            `;
+            return;
+        }
+
         const eventDate = new Date(`${nextEvent.date} ${nextEvent.time}`);
         const diffMs = eventDate - now;
         
@@ -176,39 +219,21 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const now = new Date();
-        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-        const todayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-        
-        const tomorrowStart = new Date(todayStart); tomorrowStart.setDate(tomorrowStart.getDate() + 1);
-        const tomorrowEnd = new Date(todayEnd); tomorrowEnd.setDate(tomorrowEnd.getDate() + 1);
-        
-        const dayAfterStart = new Date(todayStart); dayAfterStart.setDate(dayAfterStart.getDate() + 2);
-        const dayAfterEnd = new Date(todayEnd); dayAfterEnd.setDate(dayAfterEnd.getDate() + 2);
+        // Pull ONLY the items currently on the screen
+        const visibleItems = getVisibleItems();
 
-        itineraryData.forEach((item) => {
+        if (visibleItems.length === 0) {
+            container.innerHTML = '<p style="text-align:center; padding: 30px; color: #888;">No events match your current filters.</p>';
+            return;
+        }
+
+        const now = new Date();
+
+        visibleItems.forEach((item) => {
             const itemDateTime = new Date(`${item.date} ${item.time}`);
             const itemId = item.reference + item.date;
             const isHidden = hiddenItems.includes(itemId);
             const isPast = itemDateTime < now;
-
-            if (currentTrip !== 'all' && item.trip !== currentTrip) return;
-
-            if (currentCategory === 'hidden') {
-                if (!isHidden) return; 
-            } else {
-                if (isHidden) return; 
-                if (currentCategory !== 'all' && item.type !== currentCategory) return; 
-            }
-
-            // Time Filter Matcher
-            if (currentTime !== 'all') {
-                let timeMatch = false;
-                if (currentTime === 'today') timeMatch = (itemDateTime >= todayStart && itemDateTime <= todayEnd);
-                else if (currentTime === 'tomorrow') timeMatch = (itemDateTime >= tomorrowStart && itemDateTime <= tomorrowEnd);
-                else if (currentTime === 'dayafter') timeMatch = (itemDateTime >= dayAfterStart && itemDateTime <= dayAfterEnd);
-                if (!timeMatch) return;
-            }
 
             const card = document.createElement('div');
             let classNames = ['flight-card'];
@@ -288,11 +313,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Bulletproof click logic for Categories
     categoryBtns.forEach(btn => { 
         btn.addEventListener('click', () => { 
             const clickedCategory = btn.getAttribute('data-category');
-            
             if (currentCategory === clickedCategory) {
                 btn.classList.remove('active');
                 currentCategory = 'all';
@@ -302,14 +325,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentCategory = clickedCategory; 
             }
             renderCards(); 
+            renderCountdown(); // Ensure the countdown updates instantly!
         }); 
     });
 
-    // Bulletproof click logic for Time
     timeBtns.forEach(btn => { 
         btn.addEventListener('click', () => { 
             const clickedTime = btn.getAttribute('data-time');
-            
             if (currentTime === clickedTime) {
                 btn.classList.remove('active');
                 currentTime = 'all';
@@ -319,6 +341,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentTime = clickedTime; 
             }
             renderCards(); 
+            renderCountdown(); // Ensure the countdown updates instantly!
         }); 
     });
     
