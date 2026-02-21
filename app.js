@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('itinerary-container');
     const countdownBanner = document.getElementById('countdown-banner');
+    // NEW: Grab the trip buttons
+    const tripBtns = document.querySelectorAll('.trip-btn');
     const categoryBtns = document.querySelectorAll('.category-btn');
     const timeBtns = document.querySelectorAll('.time-btn');
     
@@ -9,6 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let hiddenItems = JSON.parse(localStorage.getItem('hiddenItineraryItems')) || [];
     let addedCalendarItems = JSON.parse(localStorage.getItem('addedCalendarItems')) || [];
     
+    // NEW: Track the current trip state
+    let currentTrip = 'all';
     let currentCategory = 'all';
     let currentTime = 'all';
     let itineraryData = []; 
@@ -45,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         row.push(curr.trim()); rows.push(row);
         
         const cleanRows = rows.filter(r => r.join('').trim() !== '');
-        if (cleanRows.length < 2) return []; // Safety check for empty sheets
+        if (cleanRows.length < 2) return []; 
         
         const headers = cleanRows[0];
         const data = [];
@@ -82,7 +86,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const nextEvent = itineraryData.find(item => {
             const itemDate = new Date(`${item.date} ${item.time}`);
             const itemId = item.reference + item.date;
-            return itemDate > now && !hiddenItems.includes(itemId);
+            
+            // The countdown should respect the active trip filter!
+            const tripMatch = currentTrip === 'all' || item.trip === currentTrip;
+            
+            return itemDate > now && !hiddenItems.includes(itemId) && tripMatch;
         });
 
         if (!nextEvent) {
@@ -112,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderCards() {
         container.innerHTML = ''; 
 
-        // NEW: Tell the user if the spreadsheet is empty!
         if (itineraryData.length === 0) {
             container.innerHTML = '<p style="text-align:center; padding: 30px; color: #888;">⚠️ No trips found. Is your Google Sheet populated and published?</p>';
             return;
@@ -130,6 +137,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const itemId = item.reference + item.date;
             const isHidden = hiddenItems.includes(itemId);
             const isPast = itemDateTime < now;
+
+            // NEW: Check Trip Filter
+            if (currentTrip !== 'all' && item.trip !== currentTrip) {
+                return;
+            }
 
             if (currentCategory === 'hidden') {
                 if (!isHidden) return; 
@@ -163,15 +175,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     : `<button class="small-hide-btn toggle-hide-btn" data-id="${itemId}">👻 Hide</button>`;
             }
 
+            // UPDATED: Sleek Icon Buttons
             let weatherLocation = (item.type === 'flight' || item.type === 'train') ? item.endPoint : item.startPoint;
-            let weatherBtnHTML = `<a href="https://www.google.com/search?q=current+weather+${encodeURIComponent(weatherLocation)}" target="_blank" class="action-btn weather-btn">⛅ Weather</a>`;
+            let weatherBtnHTML = `<a href="https://www.google.com/search?q=current+weather+${encodeURIComponent(weatherLocation)}" target="_blank" class="action-btn icon-btn" title="Weather">⛅</a>`;
 
             const calLink = generateCalendarLink(item);
             let calBtnHTML = '';
             if (addedCalendarItems.includes(itemId)) {
-                calBtnHTML = `<a href="${calLink}" target="_blank" class="action-btn calendar-added-btn">✅ Added</a>`;
+                calBtnHTML = `<a href="${calLink}" target="_blank" class="action-btn icon-btn calendar-added-btn" title="Added to Calendar">✅</a>`;
             } else {
-                calBtnHTML = `<a href="${calLink}" target="_blank" class="action-btn calendar-btn track-calendar-btn" data-id="${itemId}">📅 Calendar</a>`;
+                calBtnHTML = `<a href="${calLink}" target="_blank" class="action-btn icon-btn track-calendar-btn" data-id="${itemId}" title="Add to Calendar">📅</a>`;
             }
 
             let hrOffsetBadge = '';
@@ -224,6 +237,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // NEW: Listeners for the Trip Tabs
+    tripBtns.forEach(btn => { 
+        btn.addEventListener('click', (e) => { 
+            tripBtns.forEach(b => b.classList.remove('active')); 
+            e.target.classList.add('active'); 
+            currentTrip = e.target.dataset.trip; 
+            renderCards(); 
+            renderCountdown(); // Update the countdown to show the next event for THIS trip!
+        }); 
+    });
+
     categoryBtns.forEach(btn => { btn.addEventListener('click', (e) => { categoryBtns.forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentCategory = e.target.dataset.category; renderCards(); }); });
     timeBtns.forEach(btn => { btn.addEventListener('click', (e) => { timeBtns.forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentTime = e.target.dataset.time; renderCards(); }); });
     
@@ -246,7 +270,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 trackCalBtn.classList.remove('calendar-btn', 'track-calendar-btn');
                 trackCalBtn.classList.add('calendar-added-btn');
-                trackCalBtn.innerHTML = '✅ Added';
+                trackCalBtn.innerHTML = '✅';
             }
         }
     });
