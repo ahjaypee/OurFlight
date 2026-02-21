@@ -4,12 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Travel Itinerary</title>
-    <link rel="stylesheet" href="style.css?v=12">
+    <link rel="stylesheet" href="style.css?v=16">
 </head>
 <body>
     <header>
         <div id="countdown-banner" class="countdown-banner"></div>
         
+        <div class="filter-bar trip-bar">
+            <button class="filter-btn trip-btn active" data-trip="all">🌍 All Trips</button>
+            <button class="filter-btn trip-btn" data-trip="SE Asia">SE Asia</button>
+            <button class="filter-btn trip-btn" data-trip="Stuttgart & Venice">Stuttgart & Venice</button>
+            <button class="filter-btn trip-btn" data-trip="London & Greece">London & Greece</button>
+        </div>
+
         <div class="filter-bar">
             <button class="filter-btn category-btn active" data-category="all">All</button>
             <button class="filter-btn category-btn" data-category="flight">✈️ Flights</button>
@@ -31,9 +38,6 @@
     <main id="itinerary-container">
         </main>
 
-    <script src="app.js?v=15"></script>
+    <script src="app.js?v=16"></script>
 </body>
 </html>
-
-
-
