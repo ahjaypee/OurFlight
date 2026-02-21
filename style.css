@@ -271,28 +271,33 @@ header {
     margin-left: auto; /* This pushes it perfectly to the far right side */
 }
 
-/* Trip Filter Bar Distinct Styling */
+/* Enhanced Trip Filter Bar */
 .trip-bar {
     background-color: #e2e8f0;
-    padding: 8px;
-    border-radius: 8px;
-    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
 }
+
 .trip-btn {
+    background-color: #ffffff;
+    color: #475569;
     font-weight: bold;
-    color: #334155;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    opacity: 1 !important; /* This forces them to NOT look dulled out! */
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
+
 .trip-btn.active {
     background-color: #3b82f6;
     color: white;
-}
-
-/* Square Icon Buttons */
-.icon-btn {
-    padding: 6px 12px;
-    font-size: 1.2em;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 40px;
+    border-color: #3b82f6;
+    box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
 }
