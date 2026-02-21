@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('itinerary-container');
     const countdownBanner = document.getElementById('countdown-banner');
-    const tripBtns = document.querySelectorAll('.trip-btn');
+    const tripContainer = document.getElementById('trip-filter-container'); // NEW
     const categoryBtns = document.querySelectorAll('.category-btn');
     const timeBtns = document.querySelectorAll('.time-btn');
     
@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
             itineraryData = parseCSV(csvText);
             itineraryData.sort((a, b) => new Date(`${a.date} ${a.time}`) - new Date(`${b.date} ${b.time}`));
             
+            buildTripFilters(); // NEW: Build buttons before drawing cards
             renderCards();
             renderCountdown(); 
             setInterval(renderCountdown, 60000); 
@@ -58,6 +59,50 @@ document.addEventListener('DOMContentLoaded', () => {
             data.push(obj);
         }
         return data;
+    }
+
+    // NEW: Function to dynamically generate trip buttons
+    function buildTripFilters() {
+        // 1. Get an array of all unique trip names (ignoring empty fields)
+        const uniqueTrips = [...new Set(itineraryData.map(item => item.trip).filter(trip => trip && trip.trim() !== ''))];
+        
+        // If there are no named trips in the spreadsheet, hide the bar completely
+        if (uniqueTrips.length === 0) {
+            tripContainer.style.display = 'none';
+            return;
+        }
+
+        // Show the bar and clear anything inside it
+        tripContainer.style.display = 'flex';
+        tripContainer.innerHTML = '';
+
+        // 2. Loop through the unique names and create buttons
+        uniqueTrips.forEach(trip => {
+            const btn = document.createElement('button');
+            btn.className = 'filter-btn trip-btn';
+            btn.setAttribute('data-trip', trip);
+            btn.textContent = trip;
+            
+            // 3. Attach the click logic directly to this new button
+            btn.addEventListener('click', (e) => {
+                const clickedTrip = e.target.dataset.trip;
+                
+                if (currentTrip === clickedTrip) {
+                    e.target.classList.remove('active');
+                    currentTrip = 'all';
+                } else {
+                    document.querySelectorAll('.trip-btn').forEach(b => b.classList.remove('active')); 
+                    e.target.classList.add('active'); 
+                    currentTrip = clickedTrip; 
+                }
+                
+                renderCards(); 
+                renderCountdown(); 
+            });
+
+            // 4. Drop it onto the screen
+            tripContainer.appendChild(btn);
+        });
     }
 
     function generateCalendarLink(item) {
@@ -163,7 +208,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 card.classList.toggle('expanded');
             });
 
-            // Clean text Hide button
             let hideBtnHTML = '';
             if (isPast) {
                 hideBtnHTML = isHidden 
@@ -171,7 +215,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     : `<button class="small-hide-btn toggle-hide-btn" data-id="${itemId}">Hide</button>`;
             }
 
-            // Clean text Weather and Calendar buttons
             let weatherLocation = (item.type === 'flight' || item.type === 'train') ? item.endPoint : item.startPoint;
             let weatherBtnHTML = `<a href="https://www.google.com/search?q=current+weather+${encodeURIComponent(weatherLocation)}" target="_blank" class="action-btn weather-btn">Weather</a>`;
 
@@ -233,27 +276,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // UPDATED: Trip Tabs Toggle Logic
-    tripBtns.forEach(btn => { 
-        btn.addEventListener('click', (e) => { 
-            const clickedTrip = e.target.dataset.trip;
-            
-            // If the user clicks the currently active trip, toggle it off (return to 'all')
-            if (currentTrip === clickedTrip) {
-                e.target.classList.remove('active');
-                currentTrip = 'all';
-            } else {
-                // Otherwise, turn off any active ones and turn this one on
-                tripBtns.forEach(b => b.classList.remove('active')); 
-                e.target.classList.add('active'); 
-                currentTrip = clickedTrip; 
-            }
-            
-            renderCards(); 
-            renderCountdown(); 
-        }); 
-    });
-
     categoryBtns.forEach(btn => { btn.addEventListener('click', (e) => { categoryBtns.forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentCategory = e.target.dataset.category; renderCards(); }); });
     timeBtns.forEach(btn => { btn.addEventListener('click', (e) => { timeBtns.forEach(b => b.classList.remove('active')); e.target.classList.add('active'); currentTime = e.target.dataset.time; renderCards(); }); });
     
@@ -276,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 trackCalBtn.classList.remove('calendar-btn', 'track-calendar-btn');
                 trackCalBtn.classList.add('calendar-added-btn');
-                trackCalBtn.innerHTML = 'Added'; // Clean text here too!
+                trackCalBtn.innerHTML = 'Added';
             }
         }
     });
